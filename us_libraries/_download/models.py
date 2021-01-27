@@ -7,6 +7,6 @@ class DownloadType(Enum):
 
     # unzipped CSV files
     CsvZip = "csvs.zip"
-    SystemDataFile = "SystemDataFile.csv"
+    SystemData = "SystemDataFile.csv"
     StateSummaryAndCharacteristicData = "StateSummaryAndCharacteristicData.csv"
     OutletData = "OutletData.csv"

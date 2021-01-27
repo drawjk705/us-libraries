@@ -1,6 +1,6 @@
 [paths]
 source =
-    the_census/
+    us_libraries/
 
 [run]
 omit =
@@ -8,5 +8,3 @@ omit =
     *interface.py
     *__init__.py
     *models.py
-    *census/_helpers.py
-    *log/*

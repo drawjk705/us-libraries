@@ -81,7 +81,7 @@ class TestDownloadService(ApiServiceTestFixture[LightDownloadService]):
         *shuffled_cases(
             has_resource=[True, False],
             download_type=[
-                DownloadType.SystemDataFile,
+                DownloadType.SystemData,
                 DownloadType.StateSummaryAndCharacteristicData,
                 DownloadType.OutletData,
             ],

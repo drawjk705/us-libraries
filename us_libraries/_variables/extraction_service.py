@@ -1,89 +1,122 @@
-# # pyright: reportUnknownMemberType=false
+# pyright: reportUnknownMemberType=false
 
-# from us_libraries._variables.models import DataFileType
-# import pdfminer.high_level as pdf
-# from pdfminer.layout import LTTextContainer
-# from typing import Dict, List, Tuple, cast
-# from us_libraries._resource_mapping.models import ResourceType
-# from us_libraries._cache.interface import IOnDiskCache
-# import pandas as pd
-# from us_libraries._variables.interface import IVariableExtractionService
-# from us_libraries._resource_mapping.interface import IResourceMappingService
-# from us_libraries._config import Config
-# import tabula
+import logging
+from pathlib import Path
+from typing import Dict, List, cast
 
-# EXTRACTED_VARIABLES_RESOURCE = "extracted_variables.csv"
+import pandas as pd
+import pdfminer.high_level as pdf
+import tabula
+from pdfminer.layout import LTPage, LTTextContainer
+
+from us_libraries._cache.interface import IOnDiskCache
+from us_libraries._config import Config
+from us_libraries._download.models import DownloadType
+from us_libraries._logger.interface import ILoggerFactory
+from us_libraries._variables.interface import IVariableExtractionService
+from us_libraries._variables.models import DataFileType
+
+EXTRACTED_VARIABLES_RESOURCE = "extracted_variables.csv"
+
+STATE_SUMMARY_APPENDIX_NAME = (
+    "Record Layout for Public Library State Summary/ State Characteristics Data File"
+)
+SYSTEM_DATA_APPENDIX_NAME = "Record Layout for Public Library System Data File"
+OUTLET_DATA_APPENDIX_NAME = "Record Layout for Public Library Outlet Data File"
 
 
-# class VariableExtractionService(IVariableExtractionService):
-#     _cache: IOnDiskCache
-#     _resource_mapper: IResourceMappingService
-#     _config: Config
+class VariableExtractionService(IVariableExtractionService):
+    _cache: IOnDiskCache
+    _config: Config
+    _logger: logging.Logger
 
-#     def __init__(
-#         self,
-#         cache: IOnDiskCache,
-#         resource_mapper: IResourceMappingService,
-#         config: Config,
-#     ) -> None:
-#         self._cache = cache
-#         self._resource_mapper = resource_mapper
-#         self._config = config
+    def __init__(
+        self, cache: IOnDiskCache, config: Config, logger_factory: ILoggerFactory
+    ) -> None:
+        self._cache = cache
+        self._config = config
+        self._logger = logger_factory.get_logger(__name__)
 
-#     def extract_variables_from_pdf(self) -> pd.DataFrame:
-#         cache_res = self._cache.get(EXTRACTED_VARIABLES_RESOURCE)
+    def extract_variables_from_documentation_pdf(self) -> None:
+        has_pulled_all_vars = True
 
-#         if not cache_res.empty:
-#             return cache_res
+        for data_file_type in DataFileType:
+            res = self._cache.get(f"{data_file_type.value}.csv")
 
-#         file_prefix = f"{self._config.data_dir}/{self._config.year}"
-#         pdf_file_name = cast(
-#             Tuple[str, ...],
-#             self._resource_mapper.get_resource_paths(
-#                 for_resource=ResourceType.Documentation
-#             ),
-#         )[0]
+            if res.empty:
+                has_pulled_all_vars = False
+                break
 
-#         pdf_dfs: List[pd.DataFrame] = tabula.read_pdf(
-#             f"{file_prefix}/{pdf_file_name}", pages="all"
-#         )
+        if has_pulled_all_vars:
+            return
 
-#         all_vars = pd.DataFrame()
+        documentation_file = Path(
+            f"{self._config.data_dir}/{self._config.year}/{DownloadType.Documentation.value}"
+        )
 
-#         for df in pdf_dfs:
-#             columns = df.columns.tolist()
+        if not documentation_file.exists():
+            self._logger.info(f"no documentation file at `{documentation_file}`!")
+            return
 
-#             if "Data" not in columns:
-#                 continue
+        page_mappings = self._find_pages_with_tables(documentation_file)
 
-#             first_col = columns[0]
-#             last_col = columns[-1]
+        for datafile_type, pages in page_mappings.items():
+            str_pages = ",".join([str(page) for page in pages])
 
-#             column_remapping = {first_col: "variable_name", last_col: "description"}
+            pdf_dfs: List[pd.DataFrame] = tabula.read_pdf(
+                documentation_file, pages=str_pages
+            )
 
-#             filtered_df = df.dropna(subset=[first_col, last_col])  # type: ignore
+            all_vars = pd.DataFrame()
 
-#             renamed_df: pd.DataFrame = filtered_df.rename(columns=column_remapping)  # type: ignore
-#             smaller_df = renamed_df[["variable_name", "description"]]
+            for df in pdf_dfs:
+                columns = df.columns.tolist()
 
-#             if all_vars.empty:
-#                 all_vars = smaller_df
-#             else:
-#                 all_vars = all_vars.append(smaller_df, ignore_index=True)
+                if "Data" not in columns:
+                    continue
 
-#         df_to_return = all_vars.reset_index(drop=True)
+                first_col = columns[0]
+                last_col = columns[-1]
 
-#         self._cache.put(EXTRACTED_VARIABLES_RESOURCE, df_to_return)
+                column_remapping = {first_col: "variable_name", last_col: "description"}
 
-#         return df_to_return
+                filtered_df = df.dropna(subset=[first_col, last_col])  # type: ignore
 
-#     def _find_pages_with_tables(self) -> Dict[DataFileType: List[int]]:
-#         state_summary_appendix_name = "Record Layout for Public Library State Summary/ State Characteristics Data File"
-#         system_data_appendix_name = "Record Layout for Public Library System Data File"
-#         outlet_data_appendix_name = "Record Layout for Public Library Outlet Data File"
+                renamed_df: pd.DataFrame = filtered_df.rename(columns=column_remapping)  # type: ignore
+                smaller_df = renamed_df[["variable_name", "description"]]
 
-#         state_summary_pages = []
-#         system_data_pages = []
-#         outlet_data_pages = []
+                if all_vars.empty:
+                    all_vars = smaller_df
+                else:
+                    all_vars = all_vars.append(smaller_df, ignore_index=True)
 
-#         for page in pdf.extract_pages(f'{self._config.data_dir}/{self._config.year}/{}')
+                df_to_store = all_vars.reset_index(drop=True)
+
+                self._cache.put(f"{datafile_type.value}.csv", df_to_store)
+
+    def _find_pages_with_tables(self, file_path: Path) -> Dict[DataFileType, List[int]]:
+
+        state_summary_pages: List[int] = []
+        system_data_pages: List[int] = []
+        outlet_data_pages: List[int] = []
+
+        for page_num, page in enumerate(
+            cast(List[LTPage], pdf.extract_pages(file_path))
+        ):
+            for element in page:  # type: ignore
+                if not isinstance(element, LTTextContainer):
+                    continue
+                text: str = element.get_text()
+
+                if STATE_SUMMARY_APPENDIX_NAME in text:
+                    state_summary_pages.append(page_num)
+                if SYSTEM_DATA_APPENDIX_NAME in text:
+                    system_data_pages.append(page_num)
+                if OUTLET_DATA_APPENDIX_NAME in text:
+                    outlet_data_pages.append(page_num)
+
+        return {
+            DataFileType.StateSummary: state_summary_pages,
+            DataFileType.SystemData: system_data_pages,
+            DataFileType.OutletData: outlet_data_pages,
+        }

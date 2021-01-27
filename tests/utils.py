@@ -1,5 +1,8 @@
 from itertools import product
-from typing import Any, Collection, List, Tuple
+from typing import Any, Collection, Dict, List, Tuple
+
+import pandas
+from callee.base import Matcher
 
 
 class ServiceTestFixtureException(Exception):
@@ -91,3 +94,23 @@ class MockRes:
             raise Exception("uh oh")
 
         return self.content
+
+
+class DataFrameMatcher(Matcher):
+    _records: List[Dict[str, Any]]
+
+    def __init__(self, records: List[Dict[str, Any]]):
+        self._records = records
+
+    def match(self, value: Any) -> bool:
+        if not isinstance(value, pandas.DataFrame):
+            return False
+
+        records = value.to_dict("records")
+
+        try:
+            assert records == self._records
+        except:
+            print(records)
+            return False
+        return True

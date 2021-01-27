@@ -91,7 +91,7 @@ class DownloadService(IDownloadService):
             for sub_path in directory.iterdir():
                 new_name: str = sub_path.name
                 if "_ae_" in sub_path.name.lower():
-                    new_name = DownloadType.SystemDataFile.value
+                    new_name = DownloadType.SystemData.value
                 elif "_outlet_" in sub_path.name.lower():
                     new_name = DownloadType.OutletData.value
                 elif "_state_" in sub_path.name.lower():

@@ -7,7 +7,7 @@ from us_libraries._variables.models import VariableSet
 
 class IVariableExtractionService(ABC):
     @abstractmethod
-    def extract_variables_from_pdf(self) -> pd.DataFrame:
+    def extract_variables_from_documentation_pdf(self) -> None:
         ...
 
 
