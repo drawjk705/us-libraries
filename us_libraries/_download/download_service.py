@@ -13,8 +13,6 @@ import zipfile
 
 BASE_URL = "https://www.imls.gov"
 
-# todo rename files so that they are standardized
-
 
 class DownloadService(IDownloadService):
     _config: Config
