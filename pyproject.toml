@@ -37,3 +37,22 @@ pytest-tldr = "^0.2.2"
 [build-system]
 build-backend = "poetry.core.masonry.api"
 requires = ["poetry-core>=1.0.0"]
+
+[tool.poe.tasks]
+clean = "rm rf ./**/__pycache__"
+generate-toc = "gh-md-toc --insert README.md"
+lint = "black . --check --exclude typings"
+lint-fix = "black . --exclude typings"
+precommit-run = "pre-commit run --all-files"
+precommit-update = "pre-commit autoupdate"
+sort-imports = "isort ."
+test = "pytest -m \"not integration\""
+test-coverage = "pytest --cov-report term-missing:skip-covered --cov=the_census tests/"
+test-integration = "pytest -m integration"
+typing = "pyright"
+
+
+[tool.isort]
+profile = "black"
+skip_glob = "**/typings/**"
+src_paths = ["us_libraries", "tests"]

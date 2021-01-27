@@ -3,11 +3,12 @@
 
 import re
 from typing import cast
-from us_libraries._variables.models import VariableSet
+
 from us_libraries._variables.interface import (
-    IVariableRepository,
     IVariableExtractionService,
+    IVariableRepository,
 )
+from us_libraries._variables.models import VariableSet
 
 
 class VariableRepository(IVariableRepository):

@@ -8,9 +8,13 @@ import sys
 import traceback
 import warnings
 from collections import Counter
+
 from .builder import ParserRejectedMarkup, builder_registry
 from .dammit import UnicodeDammit
-from .element import CData, Comment, DEFAULT_OUTPUT_ENCODING, Declaration, Doctype, NavigableString, PYTHON_SPECIFIC_ENCODINGS, PageElement, ProcessingInstruction, ResultSet, Script, SoupStrainer, Stylesheet, Tag, TemplateString
+from .element import (DEFAULT_OUTPUT_ENCODING, PYTHON_SPECIFIC_ENCODINGS,
+                      CData, Comment, Declaration, Doctype, NavigableString,
+                      PageElement, ProcessingInstruction, ResultSet, Script,
+                      SoupStrainer, Stylesheet, Tag, TemplateString)
 
 """Beautiful Soup Elixir and Tonic - "The Screen-Scraper's Friend".
 

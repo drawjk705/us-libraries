@@ -1,15 +1,16 @@
 import logging
 import os
+import zipfile
+from pathlib import Path
 from typing import Dict
 
-from us_libraries._logger.interface import ILoggerFactory
 import requests
-from us_libraries._download.models import DownloadType
-from us_libraries._scraper.interface import IScrapingService
-from pathlib import Path
-from us_libraries._download.interface import IDownloadService
+
 from us_libraries._config import Config
-import zipfile
+from us_libraries._download.interface import IDownloadService
+from us_libraries._download.models import DownloadType
+from us_libraries._logger.interface import ILoggerFactory
+from us_libraries._scraper.interface import IScrapingService
 
 BASE_URL = "https://www.imls.gov"
 

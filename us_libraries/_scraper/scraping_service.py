@@ -1,16 +1,16 @@
 # pyright: reportUnknownMemberType=false
 
-import re
 import json
-from us_libraries._config import Config
+import re
 from pathlib import Path
 from typing import Dict, List, Union, cast
-from us_libraries._scraper.interface import IScrapingService
-
-import requests
 
 import bs4
+import requests
 from bs4.element import NavigableString, Tag
+
+from us_libraries._config import Config
+from us_libraries._scraper.interface import IScrapingService
 
 PUBLIC_LIBRARIES_SURVEY_URL = (
     "https://www.imls.gov/research-evaluation/data-collection/public-libraries-survey"
