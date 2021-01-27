@@ -1,8 +1,9 @@
 # pyright: reportUnknownMemberType=false
 
 import logging
+import re
 from pathlib import Path
-from typing import Dict, List, cast
+from typing import Dict, List, Optional, cast
 
 import pandas as pd
 import pdfminer.high_level as pdf
@@ -37,8 +38,12 @@ class VariableExtractionService(IVariableExtractionService):
         self._config = config
         self._logger = logger_factory.get_logger(__name__)
 
-    def extract_variables_from_documentation_pdf(self) -> None:
+    def extract_variables_from_documentation_pdf(
+        self,
+    ) -> Optional[Dict[DataFileType, pd.DataFrame]]:
         has_pulled_all_vars = True
+
+        extracted_variables: Dict[DataFileType, pd.DataFrame] = {}
 
         for data_file_type in DataFileType:
             res = self._cache.get(f"{data_file_type.value}.csv")
@@ -47,8 +52,10 @@ class VariableExtractionService(IVariableExtractionService):
                 has_pulled_all_vars = False
                 break
 
+            extracted_variables[data_file_type] = res
+
         if has_pulled_all_vars:
-            return
+            return extracted_variables
 
         documentation_file = Path(
             f"{self._config.data_dir}/{self._config.year}/{DownloadType.Documentation.value}"
@@ -56,11 +63,11 @@ class VariableExtractionService(IVariableExtractionService):
 
         if not documentation_file.exists():
             self._logger.info(f"no documentation file at `{documentation_file}`!")
-            return
+            return None
 
         page_mappings = self._find_pages_with_tables(documentation_file)
 
-        for datafile_type, pages in page_mappings.items():
+        for data_file_type, pages in page_mappings.items():
             str_pages = ",".join([str(page) for page in pages])
 
             pdf_dfs: List[pd.DataFrame] = tabula.read_pdf(
@@ -92,7 +99,15 @@ class VariableExtractionService(IVariableExtractionService):
 
                 df_to_store = all_vars.reset_index(drop=True)
 
-                self._cache.put(f"{datafile_type.value}.csv", df_to_store)
+                df_to_store["long_name"] = df_to_store["description"].apply(
+                    self._make_variable_name
+                )
+
+                self._cache.put(f"{data_file_type.value}.csv", df_to_store)
+
+                extracted_variables[data_file_type] = df_to_store
+
+        return extracted_variables
 
     def _find_pages_with_tables(self, file_path: Path) -> Dict[DataFileType, List[int]]:
 
@@ -120,3 +135,13 @@ class VariableExtractionService(IVariableExtractionService):
             DataFileType.SystemData: system_data_pages,
             DataFileType.OutletData: outlet_data_pages,
         }
+
+    def _make_variable_name(self, variable_description: str) -> str:
+        first_chunk = re.split(r"[.,!?()]", variable_description)[0]
+
+        return "_".join(
+            [
+                word.strip().capitalize()
+                for word in first_chunk.replace("-", " ").strip().split(" ")
+            ]
+        )

@@ -185,6 +185,7 @@ class TestVariableExtractionService(ServiceTestFixture[LightVariableExtractionSe
                                 {
                                     "variable_name": "banana",
                                     "description": "a yellow fruit",
+                                    "long_name": "A_Yellow_Fruit",
                                 }
                             ]
                         ),
@@ -196,6 +197,7 @@ class TestVariableExtractionService(ServiceTestFixture[LightVariableExtractionSe
                                 {
                                     "variable_name": "apple",
                                     "description": "a round-ish fruit",
+                                    "long_name": "A_Round_Ish_Fruit",
                                 }
                             ]
                         ),
@@ -207,10 +209,12 @@ class TestVariableExtractionService(ServiceTestFixture[LightVariableExtractionSe
                                 {
                                     "variable_name": "apple",
                                     "description": "a round-ish fruit",
+                                    "long_name": "A_Round_Ish_Fruit",
                                 },
                                 {
                                     "variable_name": "orange",
                                     "description": "an orange fruit",
+                                    "long_name": "An_Orange_Fruit",
                                 },
                             ]
                         ),

@@ -1,51 +1,73 @@
-# # pyright: reportUnknownMemberType=false
+# pyright: reportUnknownMemberType=false
 
 
-# import re
-# from typing import cast
+import logging
+from typing import Dict, List, cast
 
-# from us_libraries._variables.interface import (
-#     IVariableExtractionService,
-#     IVariableRepository,
-# )
-# from us_libraries._variables.models import VariableSet
+import pandas as pd
+
+from us_libraries._logger.interface import ILoggerFactory
+from us_libraries._variables.interface import (
+    IVariableExtractionService,
+    IVariableRepository,
+)
+from us_libraries._variables.models import DataFileType, VariableSet
 
 
-# class VariableRepository(IVariableRepository):
-#     _variables: VariableSet
+class VariableRepository(IVariableRepository):
+    _system_data: VariableSet
+    _state_summary: VariableSet
+    _outlet_data: VariableSet
 
-#     _extraction_service: IVariableExtractionService
+    _extraction_service: IVariableExtractionService
+    _logger: logging.Logger
 
-#     def __init__(self, extraction_service: IVariableExtractionService) -> None:
-#         self._extraction_service = extraction_service
+    def __init__(
+        self,
+        extraction_service: IVariableExtractionService,
+        logger_factory: ILoggerFactory,
+    ) -> None:
+        self._extraction_service = extraction_service
+        self._logger = logger_factory.get_logger(__name__)
 
-#     def get_variables(self):
-#         df = self._extraction_service.extract_variables_from_documentation_pdf()
+        self._system_data = VariableSet()
+        self._state_summary = VariableSet()
+        self._outlet_data = VariableSet()
 
-#         df["short_name"] = df["description"].apply(self._make_variable_name)
+    def get_variables(self) -> Dict[DataFileType, pd.DataFrame]:
+        dfs = self._extraction_service.extract_variables_from_documentation_pdf()
 
-#         records = df.to_dict("records")
+        if not dfs:
+            self._logger.info("could not extract any variables from documentation PDF")
+            return {}
 
-#         self._variables.add_variables(records)
+        for data_file_type, df in dfs.items():
+            if data_file_type == DataFileType.OutletData:
+                self._outlet_data.add_variables(
+                    cast(List[Dict[str, str]], df.to_dict("records"))
+                )
+            elif data_file_type == DataFileType.StateSummary:
+                self._state_summary.add_variables(
+                    cast(List[Dict[str, str]], df.to_dict("records"))
+                )
+            elif data_file_type == DataFileType.SystemData:
+                self.system_data.add_variables(
+                    cast(List[Dict[str, str]], df.to_dict("records"))
+                )
 
-#         return df
+        return dfs
 
-#     def get_variable_description(self, variable_name: str) -> str:
-#         variables_df = self.get_variables()
+    def get_variable_description(
+        self, variable_name: str, data_file_type: DataFileType
+    ) -> str:
+        variables_df = self.get_variables()[data_file_type]
 
-#         matches = variables_df[
-#             (variables_df["variable_name"] == variable_name)
-#             | (variables_df["short_name"] == variable_name)
-#         ]
+        matches = variables_df[
+            (variables_df["variable_name"] == variable_name)
+            | (variables_df["short_name"] == variable_name)
+        ]
 
-#         if len(matches) == 0:
-#             return ""
+        if len(matches) == 0:
+            return ""
 
-#         return cast(str, matches["description"].iloc[0])
-
-#     def _make_variable_name(self, variable_description: str) -> str:
-#         first_chunk = re.split(r"[.,!?()]", variable_description)[0]
-
-#         return "_".join(
-#             [word.strip().capitalize() for word in first_chunk.strip().split(" ")]
-#         )
+        return cast(str, matches["description"].iloc[0])

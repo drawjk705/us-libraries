@@ -1,27 +1,42 @@
 from abc import ABC, abstractmethod
+from typing import Dict, Optional
 
 import pandas as pd
 
-from us_libraries._variables.models import VariableSet
+from us_libraries._variables.models import DataFileType, VariableSet
 
 
 class IVariableExtractionService(ABC):
     @abstractmethod
-    def extract_variables_from_documentation_pdf(self) -> None:
+    def extract_variables_from_documentation_pdf(
+        self,
+    ) -> Optional[Dict[DataFileType, pd.DataFrame]]:
         ...
 
 
 class IVariableRepository(ABC):
-    _variables: VariableSet
+    _system_data: VariableSet
+    _state_summary: VariableSet
+    _outlet_data: VariableSet
 
     @abstractmethod
-    def get_variables(self) -> pd.DataFrame:
+    def get_variables(self) -> Dict[DataFileType, pd.DataFrame]:
         ...
 
     @abstractmethod
-    def get_variable_description(self, variable_name: str) -> str:
+    def get_variable_description(
+        self, variable_name: str, data_file_type: DataFileType
+    ) -> str:
         ...
 
     @property
-    def variables(self) -> VariableSet:
-        return self._variables
+    def system_data(self) -> VariableSet:
+        return self._system_data
+
+    @property
+    def state_summary(self) -> VariableSet:
+        return self._state_summary
+
+    @property
+    def outlet_data(self) -> VariableSet:
+        return self._outlet_data
