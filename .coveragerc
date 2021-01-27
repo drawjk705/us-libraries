@@ -1,0 +1,12 @@
+[paths]
+source =
+    the_census/
+
+[run]
+omit =
+    tests/*
+    *interface.py
+    *__init__.py
+    *models.py
+    *census/_helpers.py
+    *log/*
