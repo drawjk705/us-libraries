@@ -1,3 +1,4 @@
+import shutil
 from pathlib import Path
 
 import pandas as pd
@@ -15,34 +16,36 @@ class OnDiskCache(IOnDiskCache):
 
         self._init_cache()
 
-    def get(
-        self, resource_path: str, should_get_from_root_cache: bool = False
-    ) -> pd.DataFrame:
-        full_path = (
-            self._cache_path
-            if not should_get_from_root_cache
-            else self._cache_path.parent
-        ) / Path(resource_path)
+    def get(self, resource_path: str) -> pd.DataFrame:
+        if not self._config.should_cache_on_disk:
+            return pd.DataFrame()
+
+        full_path = (self._cache_path) / Path(resource_path)
 
         if not full_path.exists():
             return pd.DataFrame()
 
-        return pd.read_csv(full_path.name)  # type: ignore
+        return pd.read_csv(full_path)  # type: ignore
 
     def put(
         self,
         resource_path: str,
         resource: pd.DataFrame,
-        should_store_in_root_cache: bool = False,
     ) -> None:
-        full_path = (
-            self._cache_path
-            if not should_store_in_root_cache
-            else self._cache_path.parent
-        ) / Path(resource_path)
+        full_path = (self._cache_path) / Path(resource_path)
 
-        resource.to_csv(full_path.name)  # type: ignore
+        if not self._config.should_cache_on_disk or full_path.exists():
+            return
+
+        resource.to_csv(full_path)
 
     def _init_cache(self):
         self._cache_path = Path(f"{self._config.cache_dir}/{self._config.year}")
-        self._cache_path.mkdir(parents=True, exist_ok=True)
+
+        if self._config.should_cache_on_disk:
+            self._cache_path.mkdir(parents=True, exist_ok=True)
+
+            if self._config.should_overwrite_existing_cache:
+                shutil.rmtree(self._cache_path)
+
+                self._cache_path.mkdir(parents=True, exist_ok=True)

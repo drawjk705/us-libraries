@@ -19,15 +19,15 @@ class VariableRepository(IVariableRepository):
     _state_summary: VariableSet
     _outlet_data: VariableSet
 
-    _extraction_service: IVariableExtractionService
+    _extractor: IVariableExtractionService
     _logger: logging.Logger
 
     def __init__(
         self,
-        extraction_service: IVariableExtractionService,
+        extractor: IVariableExtractionService,
         logger_factory: ILoggerFactory,
     ) -> None:
-        self._extraction_service = extraction_service
+        self._extractor = extractor
         self._logger = logger_factory.get_logger(__name__)
 
         self._system_data = VariableSet()
@@ -35,9 +35,9 @@ class VariableRepository(IVariableRepository):
         self._outlet_data = VariableSet()
 
     def get_variables(self) -> Dict[DataFileType, pd.DataFrame]:
-        dfs = self._extraction_service.extract_variables_from_documentation_pdf()
+        dfs = self._extractor.extract_variables_from_documentation_pdf()
 
-        if not dfs:
+        if dfs is None:
             self._logger.info("could not extract any variables from documentation PDF")
             return {}
 
@@ -60,11 +60,11 @@ class VariableRepository(IVariableRepository):
     def get_variable_description(
         self, variable_name: str, data_file_type: DataFileType
     ) -> str:
-        variables_df = self.get_variables()[data_file_type]
+        if (df := self.get_variables().get(data_file_type)) is None:
+            return ""
 
-        matches = variables_df[
-            (variables_df["variable_name"] == variable_name)
-            | (variables_df["short_name"] == variable_name)
+        matches = df[
+            (df["variable_name"] == variable_name) | (df["long_name"] == variable_name)
         ]
 
         if len(matches) == 0:

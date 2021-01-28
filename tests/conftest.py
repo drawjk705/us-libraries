@@ -5,8 +5,9 @@ from pathlib import Path
 from typing import Dict, Generator, cast
 from unittest.mock import MagicMock
 
+import pandas
 import pytest
-import requests  # type: ignore
+import requests
 from pytest import FixtureRequest, MonkeyPatch
 from pytest_mock.plugin import MockerFixture
 
@@ -15,6 +16,30 @@ from tests import utils
 # pyright: reportPrivateUsage=false
 
 
+# pathlib.Path mocks
+@pytest.fixture
+def mock_path_mkdir(mocker: MockerFixture) -> MagicMock:
+    return mocker.patch.object(Path, "mkdir")
+
+
+@pytest.fixture
+def mock_path_exists(mocker: MockerFixture) -> MagicMock:
+    return mocker.patch.object(Path, "exists")
+
+
+# shutil mocks
+@pytest.fixture
+def mock_rmtree(mocker: MockerFixture) -> MagicMock:
+    return mocker.patch.object(shutil, "rmtree")
+
+
+# pandas mocks
+@pytest.fixture
+def mock_read_csv(mocker: MockerFixture) -> MagicMock:
+    return mocker.patch.object(pandas, "read_csv")
+
+
+# filesystem setup
 @pytest.fixture
 def set_current_path() -> Generator[None, None, None]:
     parent_path = Path(__file__).parent.absolute()

@@ -6,12 +6,11 @@ class VariableSet:
     def __init__(self) -> None:
         ...
 
-    def add_variables(self, description_to_variable: List[Dict[str, str]]):
-        for mapping in description_to_variable:
-            short_name = mapping["short_name"]
-            variable = mapping["variable_name"]
+    def add_variables(self, df_records: List[Dict[str, str]]):
+        for mapping in df_records:
+            long_name = mapping["long_name"]
 
-            self.__setattr__(short_name, variable)
+            self.__setattr__(long_name, long_name)
 
 
 class DataFileType(Enum):
