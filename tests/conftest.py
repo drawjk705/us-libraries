@@ -1,8 +1,7 @@
 import inspect
-import os
 import shutil
 from pathlib import Path
-from typing import Dict, Generator, cast
+from typing import Dict, cast
 from unittest.mock import MagicMock
 
 import pandas
@@ -37,29 +36,6 @@ def mock_rmtree(mocker: MockerFixture) -> MagicMock:
 @pytest.fixture
 def mock_read_csv(mocker: MockerFixture) -> MagicMock:
     return mocker.patch.object(pandas, "read_csv")
-
-
-# filesystem setup
-@pytest.fixture
-def set_current_path() -> Generator[None, None, None]:
-    parent_path = Path(__file__).parent.absolute()
-
-    os.chdir(parent_path)
-
-    temp_dir = Path("temp")
-    if temp_dir.exists():
-        shutil.rmtree(temp_dir)
-
-    temp_dir.mkdir(parents=True, exist_ok=False)
-
-    os.chdir(temp_dir.absolute())
-
-    try:
-        yield
-
-    finally:
-        os.chdir(parent_path)
-        shutil.rmtree(temp_dir.absolute())
 
 
 @pytest.fixture(autouse=True)

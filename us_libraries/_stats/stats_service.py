@@ -24,12 +24,12 @@ class StatsService(IStatsService):
         self._variable_repo = variable_repo
 
     def get_stats(self, data_file_type: DataFileType, *variables: str) -> pd.DataFrame:
-        df = self._variable_repo.get_variables(data_file_type)
+        variables_df = self._variable_repo.get_variables(data_file_type)
 
-        if df is None:
+        if variables_df is None:
             return pd.DataFrame()
 
-        vars_dict = df.to_dict("records")
+        vars_dict = variables_df.to_dict("records")
 
         stats: pd.DataFrame = pd.read_csv(  # type: ignore
             f"{self._config.data_dir}/{data_file_type_to_download_type[data_file_type].value}"

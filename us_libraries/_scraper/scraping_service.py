@@ -1,6 +1,7 @@
 # pyright: reportUnknownMemberType=false
 
 import json
+import logging
 import re
 from pathlib import Path
 from typing import Dict, List, Union, cast
@@ -10,6 +11,7 @@ import requests
 from bs4.element import NavigableString, Tag
 
 from us_libraries._config import Config
+from us_libraries._logger.interface import ILoggerFactory
 from us_libraries._scraper.interface import IScrapingService
 
 PUBLIC_LIBRARIES_SURVEY_URL = (
@@ -21,9 +23,11 @@ CACHED_URLS_FILE = "urls.json"
 
 class ScrapingService(IScrapingService):
     _config: Config
+    _logger: logging.Logger
 
-    def __init__(self, config: Config) -> None:
+    def __init__(self, config: Config, logger_factory: ILoggerFactory) -> None:
         self._config = config
+        self._logger = logger_factory.get_logger(__name__)
 
     def scrape_files(self) -> Dict[str, Dict[str, str]]:
         cached_urls_path = Path(f"{self._config.data_dir}/{CACHED_URLS_FILE}")
@@ -40,16 +44,24 @@ class ScrapingService(IScrapingService):
         return scraped_files
 
     def _scrape_files(self) -> Dict[str, Dict[str, str]]:
-        res = requests.get(PUBLIC_LIBRARIES_SURVEY_URL)  # type: ignore
+        res = requests.get(
+            PUBLIC_LIBRARIES_SURVEY_URL,
+        )
+
+        if res.status_code != 200:
+            msg = f"Got a non-200 status code for {PUBLIC_LIBRARIES_SURVEY_URL}: {res.status_code}"
+
+            self._logger.exception(msg)
+            raise Exception(msg)
 
         soup = bs4.BeautifulSoup(res.content, "html.parser")
 
         url_dict: Dict[str, Dict[str, str]] = {}
 
         for tag in cast(
-            List[Tag], soup.find_all("label", text=re.compile(r"FY \d{4}"))
+            List[Tag], soup.find_all("label", attrs={"for": re.compile(r"FY \d{4}")})
         ):
-            year = self._get_year_for_data(cast(str, tag.text))
+            year = self._get_year_for_data(cast(str, tag["for"]))
 
             url_dict[year] = {}
 
@@ -60,6 +72,8 @@ class ScrapingService(IScrapingService):
                 for anchor_tag in cast(List[Tag], sib.find_all("a")):
                     href: str = anchor_tag["href"]
                     text: str = anchor_tag.text
+
+                    text = " ".join(text.replace("\n", " ").split())
 
                     url_dict[year][text] = href
 

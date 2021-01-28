@@ -34,7 +34,9 @@ class VariableRepository(IVariableRepository):
         self._state_summary = VariableSet()
         self._outlet_data = VariableSet()
 
-    def get_variables(self, data_file_type: DataFileType) -> Optional[pd.DataFrame]:
+    def get_variables(
+        self, data_file_type: Optional[DataFileType] = None
+    ) -> Optional[pd.DataFrame]:
         dfs = self._extractor.extract_variables_from_documentation_pdf()
 
         if dfs is None:
@@ -54,6 +56,9 @@ class VariableRepository(IVariableRepository):
                 self.system_data.add_variables(
                     cast(List[Dict[str, str]], df.to_dict("records"))
                 )
+
+        if data_file_type is None:
+            return
 
         return dfs.get(data_file_type)
 

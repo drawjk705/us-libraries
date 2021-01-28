@@ -1,3 +1,5 @@
+# pyright: reportUnknownMemberType=false
+
 import logging
 import os
 import zipfile
@@ -61,7 +63,13 @@ class DownloadService(IDownloadService):
 
         url = f"{BASE_URL}/{route}"
 
-        res = requests.get(url)  # type: ignore
+        res = requests.get(url)
+
+        if res.status_code != 200:
+            msg = f"Received a non-200 status code for {url}: {res.status_code}"
+
+            self._logger.exception(msg)
+            raise Exception(msg)
 
         self._write_content(
             download_type,

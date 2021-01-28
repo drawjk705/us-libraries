@@ -20,7 +20,9 @@ class IVariableRepository(ABC):
     _outlet_data: VariableSet
 
     @abstractmethod
-    def get_variables(self, data_file_type: DataFileType) -> Optional[pd.DataFrame]:
+    def get_variables(
+        self, data_file_type: Optional[DataFileType] = None
+    ) -> Optional[pd.DataFrame]:
         ...
 
     @abstractmethod

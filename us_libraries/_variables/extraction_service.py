@@ -41,6 +41,8 @@ class VariableExtractionService(IVariableExtractionService):
     def extract_variables_from_documentation_pdf(
         self,
     ) -> Optional[Dict[DataFileType, pd.DataFrame]]:
+        self._logger.debug("extracting variables...")
+
         has_pulled_all_vars = True
 
         extracted_variables: Dict[DataFileType, pd.DataFrame] = {}
@@ -55,6 +57,7 @@ class VariableExtractionService(IVariableExtractionService):
             extracted_variables[data_file_type] = res
 
         if has_pulled_all_vars:
+            self._logger.debug("variables have already been extracted")
             return extracted_variables
 
         documentation_file = Path(
@@ -62,7 +65,7 @@ class VariableExtractionService(IVariableExtractionService):
         )
 
         if not documentation_file.exists():
-            self._logger.info(f"no documentation file at `{documentation_file}`!")
+            self._logger.error(f"no documentation file at `{documentation_file}`!")
             return None
 
         page_mappings = self._find_pages_with_tables(documentation_file)

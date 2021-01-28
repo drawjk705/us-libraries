@@ -136,7 +136,7 @@ class TestDownloadService(ApiServiceTestFixture[LightDownloadService]):
         mock_open.assert_called_once_with(path, "wb")
 
         if should_unzip:
-            mock_zipfile.assert_called_once_with(path, "r")
+            mock_zipfile.assert_called_once_with(path, "rb")
             mock_move_content.assert_called_once()
             self.cast_mock(mock_os.remove).assert_called_once_with(path)
         else:

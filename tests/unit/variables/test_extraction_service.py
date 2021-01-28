@@ -55,7 +55,7 @@ class LightVariableExtractionService(VariableExtractionService):
 
 
 class TestVariableExtractionService(ServiceTestFixture[LightVariableExtractionService]):
-    def test_find_pages_with_tables(self, set_current_path: None):
+    def test_find_pages_with_tables(self):
         mock_pages = [
             _MockLTPage(["banana"]),
             _MockLTPage(
