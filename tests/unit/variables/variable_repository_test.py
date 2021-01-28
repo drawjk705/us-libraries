@@ -47,16 +47,18 @@ class TestVariableRepository(ServiceTestFixture[VariableRepository]):
             return_value=extractor_retval if extractor_returns else None,
         )
 
-        res = self._service.get_variables()
+        res = self._service.get_variables(DataFileType.OutletData)
 
         if not extractor_returns:
-            assert res == {}
+            assert res is None
             self.cast_mock(self._service._logger.info).assert_called_once_with(
                 "could not extract any variables from documentation PDF"
             )
         else:
-            for k, v in res.items():
-                assert extractor_retval[k].to_dict("records") == v.to_dict("records")
+            assert res is not None
+            assert extractor_retval[DataFileType.OutletData].to_dict(
+                "records"
+            ) == res.to_dict("records")
 
             assert self._service.outlet_data.__dict__ == {
                 "alphabet": "alphabet",
@@ -94,7 +96,9 @@ class TestVariableRepository(ServiceTestFixture[VariableRepository]):
         self.mocker.patch.object(
             self._service,
             "get_variables",
-            return_value=extractor_retval if get_variables_returns else {},
+            return_value=extractor_retval.get(data_file_type)
+            if get_variables_returns
+            else None,
         )
 
         variable_name, expected_description = variable_name_and_expected_description

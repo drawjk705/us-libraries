@@ -2,7 +2,7 @@
 
 
 import logging
-from typing import Dict, List, cast
+from typing import Dict, List, Optional, cast
 
 import pandas as pd
 
@@ -34,33 +34,35 @@ class VariableRepository(IVariableRepository):
         self._state_summary = VariableSet()
         self._outlet_data = VariableSet()
 
-    def get_variables(self) -> Dict[DataFileType, pd.DataFrame]:
+    def get_variables(self, data_file_type: DataFileType) -> Optional[pd.DataFrame]:
         dfs = self._extractor.extract_variables_from_documentation_pdf()
 
         if dfs is None:
             self._logger.info("could not extract any variables from documentation PDF")
-            return {}
+            return None
 
-        for data_file_type, df in dfs.items():
-            if data_file_type == DataFileType.OutletData:
+        for file_type, df in dfs.items():
+            if file_type == DataFileType.OutletData:
                 self._outlet_data.add_variables(
                     cast(List[Dict[str, str]], df.to_dict("records"))
                 )
-            elif data_file_type == DataFileType.StateSummary:
+            elif file_type == DataFileType.StateSummary:
                 self._state_summary.add_variables(
                     cast(List[Dict[str, str]], df.to_dict("records"))
                 )
-            elif data_file_type == DataFileType.SystemData:
+            elif file_type == DataFileType.SystemData:
                 self.system_data.add_variables(
                     cast(List[Dict[str, str]], df.to_dict("records"))
                 )
 
-        return dfs
+        return dfs.get(data_file_type)
 
     def get_variable_description(
         self, variable_name: str, data_file_type: DataFileType
     ) -> str:
-        if (df := self.get_variables().get(data_file_type)) is None:
+        df = self.get_variables(data_file_type)
+
+        if df is None:
             return ""
 
         matches = df[

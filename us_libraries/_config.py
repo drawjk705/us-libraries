@@ -12,3 +12,4 @@ class Config:
     should_overwrite_cached_urls: bool = field(default=False)
     should_cache_on_disk: bool = field(default=False)
     should_overwrite_existing_cache: bool = field(default=False)
+    should_rename_columns: bool = field(default=True)
