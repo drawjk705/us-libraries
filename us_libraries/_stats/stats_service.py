@@ -1,48 +1,30 @@
-from typing import Dict
+# pyright: reportUnknownMemberType=false
 
 import pandas as pd
 
 from us_libraries._config import Config
-from us_libraries._download.models import DownloadType
+from us_libraries._download.models import DatafileType
 from us_libraries._stats.interface import IStatsService
-from us_libraries._variables.interface import IVariableRepository
-from us_libraries._variables.models import DataFileType
-
-data_file_type_to_download_type: Dict[DataFileType, DownloadType] = {
-    DataFileType.OutletData: DownloadType.OutletData,
-    DataFileType.StateSummary: DownloadType.StateSummaryAndCharacteristicData,
-    DataFileType.SystemData: DownloadType.SystemData,
-}
 
 
 class StatsService(IStatsService):
     _config: Config
-    _variable_repo: IVariableRepository
 
-    def __init__(self, config: Config, variable_repo: IVariableRepository) -> None:
+    def __init__(self, config: Config) -> None:
         self._config = config
-        self._variable_repo = variable_repo
 
-    def get_stats(self, data_file_type: DataFileType, *variables: str) -> pd.DataFrame:
-        variables_df = self._variable_repo.get_variables(data_file_type)
+    def get_system_data(self) -> pd.DataFrame:
+        return self._get_stats(DatafileType.SystemData)
 
-        if variables_df is None:
-            return pd.DataFrame()
+    def get_state_summary_data(self) -> pd.DataFrame:
+        return self._get_stats(DatafileType.StateSummaryAndCharacteristicData)
 
-        vars_dict = variables_df.to_dict("records")
+    def get_outlet_data(self) -> pd.DataFrame:
+        return self._get_stats(DatafileType.OutletData)
 
-        stats: pd.DataFrame = pd.read_csv(  # type: ignore
-            f"{self._config.data_dir}/{data_file_type_to_download_type[data_file_type].value}"
+    def _get_stats(self, datafile_type: DatafileType) -> pd.DataFrame:
+        stats: pd.DataFrame = pd.read_csv(
+            f"{self._config.data_dir}/{self._config.year}/{datafile_type.value}"
         )
 
-        column_mapping: Dict[str, str] = (
-            {record["short_name"]: record["long_name"] for record in vars_dict}
-            if self._config.should_rename_columns
-            else {}
-        )
-
-        renamed_stats = stats.rename(columns=column_mapping)
-
-        if len(variables) > 0:
-            return renamed_stats[list(variables)]
-        return renamed_stats
+        return stats

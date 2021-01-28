@@ -79,43 +79,49 @@ class TestDownloadService(ApiServiceTestFixture[LightDownloadService]):
 
     @pytest.mark.parametrize(
         *shuffled_cases(
+            has_urls=[True, False],
             has_resource=[True, False],
             download_type=[
-                DownloadType.SystemData,
-                DownloadType.StateSummaryAndCharacteristicData,
-                DownloadType.OutletData,
+                DownloadType.CsvZip,
+                DownloadType.Documentation,
+                DownloadType.DataElementDefinitions,
             ],
         )
     )
     def test_try_download_resource(
-        self, has_resource: bool, download_type: DownloadType
+        self, has_urls: bool, has_resource: bool, download_type: DownloadType
     ):
         resource = "route"
-        scraped_dict: Dict[str, str] = (
-            dict(resource=resource) if has_resource else dict()
-        )
+        scraped_dict: Dict[str, str] = dict(resource=resource) if has_urls else dict()
         mock_write_content = self.mocker.patch.object(self._service, "_write_content")
         mock_res_content = "banana"
         self.requests_get_mock.return_value = MockRes(200, mock_res_content)
+        self.mocker.patch.object(
+            self._service, "_resource_already_exists", return_value=has_resource
+        )
 
         self._service._try_download_resource(scraped_dict, "resource", download_type)
 
-        if not has_resource:
+        if not has_urls:
             self.cast_mock(self._service._logger.info).assert_called_once_with(
                 "The resource `resource` does not exist for 2020"
             )
             self.requests_get_mock.assert_not_called()
             mock_write_content.assert_not_called()
         else:
-            self.cast_mock(self._service._logger.info).assert_not_called()
-            self.requests_get_mock.assert_called_once_with(
-                strings.String() & strings.EndsWith(resource)
-            )
-            mock_write_content.assert_called_once_with(
-                download_type,
-                mock_res_content,
-                should_unzip=download_type == DownloadType.CsvZip,
-            )
+            if has_resource:
+                self.requests_get_mock.assert_not_called()
+                mock_write_content.assert_not_called()
+            else:
+                self.cast_mock(self._service._logger.info).assert_not_called()
+                self.requests_get_mock.assert_called_once_with(
+                    strings.String() & strings.EndsWith(resource)
+                )
+                mock_write_content.assert_called_once_with(
+                    download_type,
+                    mock_res_content,
+                    should_unzip=download_type == DownloadType.CsvZip,
+                )
 
     @pytest.mark.parametrize("should_unzip", [True, False])
     def test_write_content(
@@ -136,7 +142,7 @@ class TestDownloadService(ApiServiceTestFixture[LightDownloadService]):
         mock_open.assert_called_once_with(path, "wb")
 
         if should_unzip:
-            mock_zipfile.assert_called_once_with(path, "rb")
+            mock_zipfile.assert_called_once_with(path, "r")
             mock_move_content.assert_called_once()
             self.cast_mock(mock_os.remove).assert_called_once_with(path)
         else:

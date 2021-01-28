@@ -2,10 +2,16 @@ from abc import ABC, abstractmethod
 
 import pandas as pd
 
-from us_libraries._variables.models import DataFileType
-
 
 class IStatsService(ABC):
     @abstractmethod
-    def get_stats(self, data_file_type: DataFileType, *variables: str) -> pd.DataFrame:
+    def get_system_data(self) -> pd.DataFrame:
+        ...
+
+    @abstractmethod
+    def get_state_summary_data(self) -> pd.DataFrame:
+        ...
+
+    @abstractmethod
+    def get_outlet_data(self) -> pd.DataFrame:
         ...

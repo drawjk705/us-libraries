@@ -10,7 +10,7 @@ import requests
 
 from us_libraries._config import Config
 from us_libraries._download.interface import IDownloadService
-from us_libraries._download.models import DownloadType
+from us_libraries._download.models import DatafileType, DownloadType
 from us_libraries._logger.interface import ILoggerFactory
 from us_libraries._scraper.interface import IScrapingService
 
@@ -36,7 +36,9 @@ class DownloadService(IDownloadService):
     def download(self) -> None:
         scraped_dict = self._scraper.scrape_files()
 
-        if not (scraped_dict_for_year := scraped_dict.get(str(self._config.year))):
+        scraped_dict_for_year = scraped_dict.get(str(self._config.year))
+
+        if scraped_dict_for_year is None:
             self._logger.info(f"There is no data for {self._config.year}")
             return
 
@@ -55,9 +57,17 @@ class DownloadService(IDownloadService):
     def _try_download_resource(
         self, scraped_dict: Dict[str, str], resource: str, download_type: DownloadType
     ) -> None:
-        if not (route := scraped_dict.get(resource)):
+        route = scraped_dict.get(resource)
+
+        if route is None:
             self._logger.info(
                 f"The resource `{resource}` does not exist for {self._config.year}"
+            )
+            return
+
+        if self._resource_already_exists(download_type):
+            self._logger.debug(
+                f"Resources have already been downloaded for {download_type}"
             )
             return
 
@@ -76,6 +86,20 @@ class DownloadService(IDownloadService):
             res.content,
             should_unzip=str(download_type.value).endswith(".zip"),
         )
+
+    def _resource_already_exists(self, download_type: DownloadType) -> bool:
+        if download_type in [
+            DownloadType.Documentation,
+            DownloadType.DataElementDefinitions,
+        ]:
+            return Path(f"{self._data_prefix}/{download_type.value}").exists()
+        elif download_type == DownloadType.CsvZip:
+            for datafile_type in DatafileType:
+                if not Path(f"{self._data_prefix}/{datafile_type.value}").exists():
+                    return False
+            return True
+
+        return False
 
     def _write_content(
         self, download_type: DownloadType, content: bytes, should_unzip: bool = False
@@ -99,11 +123,13 @@ class DownloadService(IDownloadService):
             for sub_path in directory.iterdir():
                 new_name: str = sub_path.name
                 if "_ae_" in sub_path.name.lower():
-                    new_name = DownloadType.SystemData.value
+                    new_name = DatafileType.SystemData.value
                 elif "_outlet_" in sub_path.name.lower():
-                    new_name = DownloadType.OutletData.value
+                    new_name = DatafileType.OutletData.value
                 elif "_state_" in sub_path.name.lower():
-                    new_name = DownloadType.StateSummaryAndCharacteristicData.value
+                    new_name = DatafileType.StateSummaryAndCharacteristicData.value
+                elif "readme" in sub_path.name.lower():
+                    new_name = "README.txt"
 
                 os.rename(sub_path, self._data_prefix / new_name)
             os.rmdir(directory)

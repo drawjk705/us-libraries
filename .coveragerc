@@ -8,3 +8,4 @@ omit =
     *interface.py
     *__init__.py
     *models.py
+    **/_logger/*

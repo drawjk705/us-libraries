@@ -5,13 +5,11 @@ name = "us-libraries"
 version = "0.1.0"
 
 [tool.poetry.dependencies]
-"pdfminer.six" = "^20201018"
 beautifulsoup4 = "^4.9.3"
 pandas = "^1.2.1"
 punq = "^0.4.1"
 python = "^3.9"
 requests = "^2.25.1"
-tabula-py = "^2.2.0"
 
 [tool.poetry.dev-dependencies]
 black = { version = "^20.8b1", allow-prereleases = true }
