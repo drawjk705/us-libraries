@@ -39,7 +39,6 @@ build-backend = "poetry.core.masonry.api"
 requires = ["poetry-core>=1.0.0"]
 
 [tool.poe.tasks]
-clean = "rm rf ./**/__pycache__"
 generate-toc = "gh-md-toc --insert README.md"
 lint = "black . --check --exclude typings"
 lint-fix = "black . --exclude typings"
