@@ -1,7 +1,9 @@
 [tool.poetry]
 authors = ["Joel Krim <drawjk705@gmail.com>"]
-description = ""
+description = "Client to get and analyze data from the US Public Library Survey"
 name = "us-libraries"
+readme = "README.md"
+repository = "https://github.com/drawjk705/us-libraries"
 version = "0.1.0"
 
 [tool.poetry.dependencies]
