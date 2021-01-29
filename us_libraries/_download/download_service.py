@@ -61,6 +61,8 @@ class DownloadService(IDownloadService):
     ) -> None:
         route = scraped_dict.get(resource)
 
+        self._logger.debug(f"Trying to download {resource}")
+
         if route is None:
             self._logger.info(
                 f"The resource `{resource}` does not exist for {self._config.year}"
@@ -108,6 +110,8 @@ class DownloadService(IDownloadService):
     ) -> None:
         path = f"{self._data_prefix}/{download_type.value}"
 
+        self._logger.debug(f"Writing data to file: {path}")
+
         with open(path, "wb") as f:
             f.write(content)
 
@@ -139,7 +143,11 @@ class DownloadService(IDownloadService):
         elif "readme" in path.name.lower():
             new_name = "README.txt"
 
-        os.rename(path, self._data_prefix / new_name)
+        new_path = self._data_prefix / new_name
+
+        self._logger.debug(f"Moving {path} to {new_path}")
+
+        os.rename(path, new_path)
 
     def _setup_data_dir(self) -> None:
         self._data_prefix = Path(f"{self._config.data_dir}/{self._config.year}")
@@ -147,6 +155,8 @@ class DownloadService(IDownloadService):
         self._data_prefix.mkdir(parents=True, exist_ok=True)
 
     def _clean_up_readme(self):
+        self._logger.debug("Cleaning up readme")
+
         with open(
             f"{self._config.data_dir}/{self._config.year}/README.txt",
             "r",

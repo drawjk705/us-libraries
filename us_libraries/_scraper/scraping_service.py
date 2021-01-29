@@ -33,12 +33,17 @@ class ScrapingService(IScrapingService):
         cached_urls_path = Path(f"{self._config.data_dir}/{CACHED_URLS_FILE}")
 
         if cached_urls_path.exists() and not self._config.should_overwrite_cached_urls:
+            self._logger.debug(f"Pulling cached urls from {cached_urls_path}")
+
             with open(cached_urls_path, "r") as f:
                 return json.load(f)
+
+        self._logger.debug("Pulling URLs from web")
 
         scraped_files = self._scrape_files()
 
         with open(cached_urls_path, "w") as f:
+            self._logger.debug("Dumping scraped URLs")
             json.dump(scraped_files, f)
 
         return scraped_files

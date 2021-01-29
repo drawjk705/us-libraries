@@ -1,0 +1,321 @@
+name: CI
+
+on:
+    pull_request:
+    push:
+        branches:
+            - main
+
+jobs:
+    debug:
+        runs-on: ubuntu-latest
+        steps:
+            - name: echo context
+              run: |
+                  echo $CONTEXT
+              env:
+                  CONTEXT: ${{ toJson(github) }}
+
+    lint:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                python-version: [3.9]
+            fail-fast: false
+
+        steps:
+            - name: checkout repo
+              uses: actions/checkout@v2
+
+            - name: set up python
+              uses: actions/setup-python@v2
+              with:
+                  python-version: ${{ matrix.python-version }}
+
+            - name: set up node
+              uses: actions/setup-node@v2
+              with:
+                  node-version: '12'
+
+            - name: install poetry
+              uses: snok/install-poetry@v1.1.1
+              with:
+                  version: 1.1.4
+                  virtualenvs-create: true
+                  virtualenvs-in-project: true
+
+            - name: load cached venv
+              id: cached-poetry-dependencies
+              uses: actions/cache@v2
+              with:
+                  path: .venv
+                  key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-${{ secrets.CACHE_VERSION }}
+
+            - name: install poetry dependencies
+              run: poetry install
+              if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+
+            - name: load cached npm
+              id: cached-npm-dependencies
+              uses: actions/cache@v2
+              with:
+                  path: ~/.npm
+                  key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}-${{ secrets.CACHE_VERSION }}
+
+            - name: install pyright dependencies
+              run: sudo npm install -g pyright
+
+            - name: lint
+              run: |
+                  source ./.venv/bin/activate
+                  poe typing
+                  poe lint
+                  poe sort-imports -c
+
+    test:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                python-version: [3.9]
+            fail-fast: false
+
+        steps:
+            - name: checkout repo
+              uses: actions/checkout@v2
+
+            - name: set up python
+              uses: actions/setup-python@v2
+              with:
+                  python-version: ${{ matrix.python-version }}
+
+            - name: install poetry action
+              uses: snok/install-poetry@v1.1.1
+              with:
+                  version: 1.1.4
+                  virtualenvs-create: true
+                  virtualenvs-in-project: true
+
+            - name: Load cached venv
+              id: cached-poetry-dependencies
+              uses: actions/cache@v2
+              with:
+                  path: .venv
+                  key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-${{ secrets.CACHE_VERSION }}
+
+            - name: install poetry dependencies
+              run: poetry install
+              if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+
+            - name: test it
+              run: |
+                  source ./.venv/bin/activate
+                  poe test-coverage -vv
+                  coverage report
+
+    build:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                python-version: [3.9]
+            fail-fast: false
+
+        steps:
+            - name: checkout repo
+              uses: actions/checkout@v2
+
+            - name: set up python
+              uses: actions/setup-python@v2
+              with:
+                  python-version: ${{ matrix.python-version }}
+
+            - name: install poetry
+              uses: snok/install-poetry@v1.1.1
+              with:
+                  version: 1.1.4
+                  virtualenvs-create: true
+                  virtualenvs-in-project: true
+
+            - name: load cached venv
+              id: cached-poetry-dependencies
+              uses: actions/cache@v2
+              with:
+                  path: .venv
+                  key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-${{ secrets.CACHE_VERSION }}
+
+            - name: install poetry dependencies
+              run: poetry install
+              if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+
+            - name: try build
+              run: poetry build
+
+    enforce-title:
+        if: >-
+            github.event_name == 'pull_request' &&
+            github.event.pull_request.user.login != 'dependabot-preview[bot]'
+        runs-on: ubuntu-latest
+        steps:
+            - name: echo title
+              run: |
+                  echo "title is '$TITLE'"
+              env:
+                  TITLE: ${{ github.event.pull_request.title }}
+
+            - name: check for major
+              id: major
+              if: "startsWith(github.event.pull_request.title, 'breaking: ')"
+              run: |
+                  echo "::set-output name=exists::1"
+
+            - name: check for minor
+              id: minor
+              if: "startsWith(github.event.pull_request.title, 'feat: ')"
+              run: |
+                  echo "::set-output name=exists::1"
+
+            - name: check for patch
+              id: patch
+              if: >-
+                  startsWith(github.event.pull_request.title, 'fix: ') ||
+                  startsWith(github.event.pull_request.title, 'Revert ')
+              run: |
+                  echo "::set-output name=exists::1"
+
+            - name: check for chore
+              id: chore
+              if: "startsWith(github.event.pull_request.title, 'chore: ')"
+              run: |
+                  echo "::set-output name=exists::1"
+
+            - name: check for prerelease
+              id: prerelease
+              if: "startsWith(github.event.pull_request.title, 'prerelease: ')"
+              run: |
+                  echo "::set-output name=exists::1"
+
+            - name: enforce
+              run: |
+                  if [ -z "$IS_MAJOR" ] && [ -z "$IS_MINOR" ] && [ -z "$IS_PATCH" ] && [ -z "$IS_CHORE" ] && [ -z "$IS_PRERELEASE" ];
+                  then
+                    echo "PR must be prefixes with one of the following: ['breaking: ', 'feat: ', 'fix: ', 'chore: ', prerelease: ']"
+                    exit 1
+                  fi
+              env:
+                  IS_MAJOR: ${{ steps.major.outputs.exists }}
+                  IS_MINOR: ${{ steps.minor.outputs.exists }}
+                  IS_PATCH: ${{ steps.patch.outputs.exists }}
+                  IS_CHORE: ${{ steps.chore.outputs.exists }}
+                  IS_PRERELEASE: ${{ steps.prerelease.outputs.exists }}
+
+    create-tag-and-trigger-staging:
+        environment: CI
+        if: >-
+            ${{ github.event_name == 'push' &&
+                github.ref == 'refs/heads/main' && 
+                (
+                  startsWith(github.event.head_commit.message, 'breaking') ||
+                  startsWith(github.event.head_commit.message, 'feat') || 
+                  startsWith(github.event.head_commit.message, 'fix') ||
+                  startsWith(github.event.head_commit.message, 'Revert') ||
+                  startsWith(github.event.head_commit.message, 'prerelease') ||
+                  github.event.commits.*.author.*.name == 'dependabot-preview[bot]'
+                )
+              }}
+
+        needs: [test, lint, build]
+        runs-on: ubuntu-latest
+        steps:
+            - name: checkout repo
+              uses: actions/checkout@v2
+
+            # source https://github.com/ekalinin/github-markdown-toc#toc-generation-with-github-actions
+            - name: update README TOC
+              run: |
+                  curl https://raw.githubusercontent.com/ekalinin/github-markdown-toc/master/gh-md-toc -o gh-md-toc
+                  chmod a+x gh-md-toc
+                  ./gh-md-toc --insert --no-backup README.md
+
+            - name: set up python
+              uses: actions/setup-python@v2
+              with:
+                  python-version: ${{ matrix.python-version }}
+
+            - name: install poetry
+              uses: snok/install-poetry@v1.1.1
+              with:
+                  version: 1.1.4
+                  virtualenvs-create: true
+                  virtualenvs-in-project: true
+
+            - name: load cached venv
+              id: cached-poetry-dependencies
+              uses: actions/cache@v2
+              with:
+                  path: .venv
+                  key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-${{ secrets.CACHE_VERSION }}
+
+            - name: install poetry dependencies
+              run: poetry install
+              if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+
+            - name: check for major
+              id: major
+              if: "startsWith(github.event.head_commit.message, 'breaking: ')"
+              run: |
+                  echo "bump_type=major" >> $GITHUB_ENV
+
+            - name: check for minor
+              id: minor
+              if: "startsWith(github.event.head_commit.message, 'feat: ')"
+              run: |
+                  echo "bump_type=minor" >> $GITHUB_ENV
+
+            - name: check for patch
+              id: patch
+              if: >-
+                  startsWith(github.event.head_commit.message, 'fix: ') ||
+                  startsWith(github.event.head_commit.message, 'Revert ') ||
+                  github.event.commits.*.author.*.name == 'dependabot-preview[bot]'
+              run: |
+                  echo "bump_type=patch" >> $GITHUB_ENV
+
+            - name: check for prerelease
+              id: prerelease
+              if: "startsWith(github.event.head_commit.message, 'prerelease: ')"
+              run: |
+                  echo "bump_type=prerelease" >> $GITHUB_ENV
+
+            - name: make sure bump type isn't empty
+              id: check-if-empty
+              run: |
+                  if [ -z "$bump_type" ];
+                  then
+                      echo "should_tag=0" >> $GITHUB_ENV
+                  else
+                      echo "should_tag=1" >> $GITHUB_ENV
+                  fi
+
+            - name: bump version
+              if: ${{ env.should_tag == 1 }}
+              run: |
+                  poetry version $BUMP_TYPE
+
+                  VERSION=$(poetry version --short)
+                  echo "version=v$VERSION" >> $GITHUB_ENV
+              env:
+                  BUMP_TYPE: ${{ env.bump_type }}
+
+            - name: commit to main
+              if: ${{ env.should_tag == 1 }}
+              uses: EndBug/add-and-commit@v6
+              with:
+                  message: bump ${{ env.version }}
+                  tag: ${{ env.version }}
+
+            - uses: ph-fritsche/action-dispatch@v1
+              if: ${{ env.should_tag == 1 }}
+              with:
+                  token: ${{ secrets.STAGING_TRIGGER_TOKEN }}
+                  type: workflow
+                  ident: staging.yml
+                  payload: '{ "tag": "${{ env.version }}" }'

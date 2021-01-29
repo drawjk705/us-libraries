@@ -7,6 +7,7 @@ from callee.strings import EndsWith, String
 from tests.service_test_fixtures import ServiceTestFixture
 from us_libraries._config import Config
 from us_libraries._download.models import DatafileType
+from us_libraries._logger.interface import ILoggerFactory
 from us_libraries._stats.stats_service import StatsService
 
 read_csv_retval = pandas.DataFrame(
@@ -34,8 +35,8 @@ read_csv_retval = pandas.DataFrame(
 
 
 class LightStatsService(StatsService):
-    def __init__(self) -> None:
-        super().__init__(config=Config(2018))
+    def __init__(self, logger_factory: ILoggerFactory) -> None:
+        super().__init__(config=Config(2018), logger_factory=logger_factory)
 
 
 class TestStatsService(ServiceTestFixture[LightStatsService]):
