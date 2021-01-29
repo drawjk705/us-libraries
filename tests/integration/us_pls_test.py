@@ -15,8 +15,8 @@ from tests.integration.expected_stat_columns import (
     EXPECTED_SYS_DATA_COLS,
 )
 from tests.utils import MockRes, shuffled_cases
-from us_libraries._download.models import DatafileType
-from us_libraries.libraries import Libraries
+from us_pls._download.models import DatafileType
+from us_pls.libraries import PublicLibrariesSurvey
 
 
 @pytest.fixture(autouse=True)
@@ -135,7 +135,7 @@ def test_init_if_no_files_exist_downloads_datafiles(mocker: MockerFixture):
     for data_file in data_files:
         assert not Path(data_file).exists()
 
-    _ = Libraries(
+    _ = PublicLibrariesSurvey(
         2017,
         should_overwrite_cached_urls=False,
         should_overwrite_existing_cache=False,
@@ -159,7 +159,7 @@ def test_api_hits(
     if downloaded_files_exist:
         given_downloaded_files_exist()
 
-    _ = Libraries(
+    _ = PublicLibrariesSurvey(
         2017,
         should_overwrite_cached_urls=False,
         should_overwrite_existing_cache=False,
@@ -194,7 +194,7 @@ def test_given_scraper_returns_400(mocker: MockerFixture):
         Exception,
         match="Got a non-200 status code for https://www.imls.gov/research-evaluation/data-collection/public-libraries-survey: 400",
     ):
-        Libraries(2017)
+        PublicLibrariesSurvey(2017)
 
 
 @pytest.mark.integration
@@ -210,7 +210,7 @@ def test_given_download_returns_400(mocker: MockerFixture):
         Exception,
         match="Received a non-200 status code for https://www.imls.gov//sites/default/files/fy2017_pls_data_file_documentation.pdf: 400",
     ):
-        Libraries(2017)
+        PublicLibrariesSurvey(2017)
 
 
 @pytest.mark.integration
@@ -232,7 +232,7 @@ def test_given_download_returns_400(mocker: MockerFixture):
     ],
 )
 def test_stats(datafile_type: DatafileType, expected_columns: List[str]):
-    lib = Libraries(2017)
+    lib = PublicLibrariesSurvey(2017)
 
     columns = lib.get_stats(datafile_type).columns.tolist()
 
@@ -260,7 +260,7 @@ def test_stats(datafile_type: DatafileType, expected_columns: List[str]):
 def test_read_docs(
     capsys: CaptureFixture[str], datafile_type: DatafileType, expected_value: str
 ):
-    lib = Libraries(2017)
+    lib = PublicLibrariesSurvey(2017)
 
     lib.read_docs(on=datafile_type)
 
@@ -269,6 +269,6 @@ def test_read_docs(
 
 @pytest.mark.integration
 def test_repr():
-    lib = Libraries(2017)
+    lib = PublicLibrariesSurvey(2017)
 
-    assert str(lib) == "<Libraries 2017>"
+    assert str(lib) == "<PublicLibrariesSurvey 2017>"

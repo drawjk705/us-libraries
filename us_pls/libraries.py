@@ -3,21 +3,21 @@
 import pandas as pd
 import punq
 
-from us_libraries._client import LibrariesClient
-from us_libraries._config import DEFAULT_DATA_DIR, Config
-from us_libraries._download.download_service import DownloadService
-from us_libraries._download.interface import IDownloadService
-from us_libraries._download.models import DatafileType
-from us_libraries._logger.configure_logger import DEFAULT_LOG_FILE, configure_logger
-from us_libraries._logger.factory import LoggerFactory
-from us_libraries._logger.interface import ILoggerFactory
-from us_libraries._scraper.interface import IScrapingService
-from us_libraries._scraper.scraping_service import ScrapingService
-from us_libraries._stats.interface import IStatsService
-from us_libraries._stats.stats_service import StatsService
+from us_pls._client import LibrariesClient
+from us_pls._config import DEFAULT_DATA_DIR, Config
+from us_pls._download.download_service import DownloadService
+from us_pls._download.interface import IDownloadService
+from us_pls._download.models import DatafileType
+from us_pls._logger.configure_logger import DEFAULT_LOG_FILE, configure_logger
+from us_pls._logger.factory import LoggerFactory
+from us_pls._logger.interface import ILoggerFactory
+from us_pls._scraper.interface import IScrapingService
+from us_pls._scraper.scraping_service import ScrapingService
+from us_pls._stats.interface import IStatsService
+from us_pls._stats.stats_service import StatsService
 
 
-class Libraries:
+class PublicLibrariesSurvey:
     _client: LibrariesClient
     _config: Config
 
@@ -62,7 +62,7 @@ class Libraries:
         return self._client.read_docs(on)
 
     def __repr__(self) -> str:
-        return f"<Libraries {self._config.year}>"
+        return f"<PublicLibrariesSurvey {self._config.year}>"
 
     def __str__(self) -> str:
         return self.__repr__()

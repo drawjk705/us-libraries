@@ -7,9 +7,9 @@ from pytest_mock.plugin import MockerFixture
 
 from tests.service_test_fixtures import ServiceTestFixture
 from tests.utils import shuffled_cases
-from us_libraries._scraper.scraping_service import ScrapingService
+from us_pls._scraper.scraping_service import ScrapingService
 
-patch_path_prefix = "us_libraries._scraper.scraping_service"
+patch_path_prefix = "us_pls._scraper.scraping_service"
 
 
 @pytest.fixture

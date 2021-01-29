@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 
-from us_libraries._logger.configure_logger import DEFAULT_LOG_FILE
+from us_pls._logger.configure_logger import DEFAULT_LOG_FILE
 
 DEFAULT_DATA_DIR = "data"
 

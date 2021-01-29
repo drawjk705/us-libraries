@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 import pandas as pd
 
-from us_libraries._download.models import DatafileType
+from us_pls._download.models import DatafileType
 
 
 class IStatsService(ABC):

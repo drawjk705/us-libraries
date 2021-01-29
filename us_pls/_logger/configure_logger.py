@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from us_libraries._logger.filters import ModuleFilter
+from us_pls._logger.filters import ModuleFilter
 
 DEFAULT_LOG_FILE = "us-libraries.log"
 

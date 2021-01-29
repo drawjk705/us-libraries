@@ -5,10 +5,10 @@ import pytest
 from callee.strings import EndsWith, String
 
 from tests.service_test_fixtures import ServiceTestFixture
-from us_libraries._config import Config
-from us_libraries._download.models import DatafileType
-from us_libraries._logger.interface import ILoggerFactory
-from us_libraries._stats.stats_service import StatsService
+from us_pls._config import Config
+from us_pls._download.models import DatafileType
+from us_pls._logger.interface import ILoggerFactory
+from us_pls._stats.stats_service import StatsService
 
 read_csv_retval = pandas.DataFrame(
     [

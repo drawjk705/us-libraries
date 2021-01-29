@@ -1,6 +1,6 @@
 import logging
 
-from us_libraries._logger.interface import ILoggerFactory
+from us_pls._logger.interface import ILoggerFactory
 
 
 class LoggerFactory(ILoggerFactory):

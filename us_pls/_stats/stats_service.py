@@ -6,10 +6,10 @@ from typing import Dict, List
 
 import pandas as pd
 
-from us_libraries._config import Config
-from us_libraries._download.models import DatafileType
-from us_libraries._logger.interface import ILoggerFactory
-from us_libraries._stats.interface import IStatsService
+from us_pls._config import Config
+from us_pls._download.models import DatafileType
+from us_pls._logger.interface import ILoggerFactory
+from us_pls._stats.interface import IStatsService
 
 
 class StatsService(IStatsService):

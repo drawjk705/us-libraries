@@ -2,10 +2,10 @@ import logging
 
 import pandas as pd
 
-from us_libraries._download.interface import IDownloadService
-from us_libraries._download.models import DatafileType
-from us_libraries._logger.interface import ILoggerFactory
-from us_libraries._stats.interface import IStatsService
+from us_pls._download.interface import IDownloadService
+from us_pls._download.models import DatafileType
+from us_pls._logger.interface import ILoggerFactory
+from us_pls._stats.interface import IStatsService
 
 
 class LibrariesClient:

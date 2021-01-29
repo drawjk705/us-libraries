@@ -1,5 +1,5 @@
 {
-    "include": ["us_libraries", "tests"],
+    "include": ["us_pls", "tests"],
     "ignore": ["typings"],
     "stubPath": "./typings",
 

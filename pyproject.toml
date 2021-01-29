@@ -1,10 +1,10 @@
 [tool.poetry]
 authors = ["Joel Krim <drawjk705@gmail.com>"]
 description = "Client to get and analyze data from the US Public Library Survey"
-name = "us-libraries"
+name = "us-pls"
 readme = "README.md"
 repository = "https://github.com/drawjk705/us-libraries"
-version = "0.1.0"
+version = "0.0.2-alpha.0"
 
 [tool.poetry.dependencies]
 beautifulsoup4 = "^4.9.3"
@@ -17,7 +17,6 @@ requests = "^2.25.1"
 black = { version = "^20.8b1", allow-prereleases = true }
 callee = "^0.3.1"
 data-science-types = "^0.2.22"
-hypothesis = "^6.0.3"
 ipython = "^7.19.0"
 ipywidgets = "^7.6.2"
 isort = "^5.7.0"
@@ -46,7 +45,7 @@ precommit-run = "pre-commit run --all-files"
 precommit-update = "pre-commit autoupdate"
 sort-imports = "isort ."
 test = "pytest -m \"not integration\""
-test-coverage = "pytest --cov-report term-missing:skip-covered --cov=us_libraries tests/"
+test-coverage = "pytest --cov-report term-missing:skip-covered --cov=us_pls tests/"
 test-integration = "pytest -m integration"
 typing = "pyright"
 
@@ -54,4 +53,4 @@ typing = "pyright"
 [tool.isort]
 profile = "black"
 skip_glob = "**/typings/**"
-src_paths = ["us_libraries", "tests"]
+src_paths = ["us_pls", "tests"]

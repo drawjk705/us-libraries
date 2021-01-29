@@ -8,11 +8,11 @@ from typing import Dict
 
 import requests
 
-from us_libraries._config import Config
-from us_libraries._download.interface import IDownloadService
-from us_libraries._download.models import DatafileType, DownloadType
-from us_libraries._logger.interface import ILoggerFactory
-from us_libraries._scraper.interface import IScrapingService
+from us_pls._config import Config
+from us_pls._download.interface import IDownloadService
+from us_pls._download.models import DatafileType, DownloadType
+from us_pls._logger.interface import ILoggerFactory
+from us_pls._scraper.interface import IScrapingService
 
 BASE_URL = "https://www.imls.gov"
 

@@ -1,6 +1,6 @@
 [paths]
 source =
-    us_libraries/
+    us_pls/
 
 [run]
 omit =

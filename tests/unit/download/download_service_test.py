@@ -10,18 +10,18 @@ from pytest_mock.plugin import MockerFixture
 
 from tests.service_test_fixtures import ApiServiceTestFixture
 from tests.utils import MockRes, shuffled_cases
-from us_libraries._config import Config
-from us_libraries._download.download_service import DownloadService
-from us_libraries._download.models import DownloadType
-from us_libraries._logger.interface import ILoggerFactory
-from us_libraries._scraper.interface import IScrapingService
+from us_pls._config import Config
+from us_pls._download.download_service import DownloadService
+from us_pls._download.models import DownloadType
+from us_pls._logger.interface import ILoggerFactory
+from us_pls._scraper.interface import IScrapingService
 
 config = Config(2020)
 
 
 @pytest.fixture
 def mock_os(mocker: MockerFixture) -> MagicMock:
-    return mocker.patch("us_libraries._download.download_service.os")
+    return mocker.patch("us_pls._download.download_service.os")
 
 
 @pytest.fixture
@@ -31,7 +31,7 @@ def mock_zipfile(mocker: MockerFixture) -> MagicMock:
 
 @pytest.fixture(autouse=True)
 def mock_path(mocker: MockerFixture) -> MagicMock:
-    return mocker.patch("us_libraries._download.download_service.Path")
+    return mocker.patch("us_pls._download.download_service.Path")
 
 
 class LightDownloadService(DownloadService):
