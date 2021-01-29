@@ -34,5 +34,4 @@ class LibrariesClient:
     def __init_client(self) -> None:
         # download the resources needed to
         # get things started
-        self._logger.info("Scraping Public Libraries Survey page for data...")
         self._downloader.download()

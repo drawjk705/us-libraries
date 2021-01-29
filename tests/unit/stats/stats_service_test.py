@@ -1,5 +1,3 @@
-from unittest.mock import MagicMock
-
 import pandas
 import pytest
 from callee.strings import EndsWith, String
@@ -8,6 +6,7 @@ from tests.service_test_fixtures import ServiceTestFixture
 from us_pls._config import Config
 from us_pls._download.models import DatafileType
 from us_pls._logger.interface import ILoggerFactory
+from us_pls._persistence.interface import IOnDiskCache
 from us_pls._stats.stats_service import StatsService
 
 read_csv_retval = pandas.DataFrame(
@@ -35,8 +34,10 @@ read_csv_retval = pandas.DataFrame(
 
 
 class LightStatsService(StatsService):
-    def __init__(self, logger_factory: ILoggerFactory) -> None:
-        super().__init__(config=Config(2018), logger_factory=logger_factory)
+    def __init__(self, cache: IOnDiskCache, logger_factory: ILoggerFactory) -> None:
+        super().__init__(
+            config=Config(2018), cache=cache, logger_factory=logger_factory
+        )
 
 
 class TestStatsService(ServiceTestFixture[LightStatsService]):
@@ -51,13 +52,16 @@ class TestStatsService(ServiceTestFixture[LightStatsService]):
     def test_get_stats(
         self,
         datafile_type: DatafileType,
-        mock_read_csv: MagicMock,
     ):
-        mock_read_csv.return_value = read_csv_retval
+        mock_cache_get = self.mocker.patch.object(
+            self._service._cache, "get", return_value=read_csv_retval
+        )
 
         res = self._service.get_stats(datafile_type)
 
-        mock_read_csv.assert_called_once_with(String() & EndsWith(datafile_type.value))
+        mock_cache_get.assert_called_once_with(
+            String() & EndsWith(datafile_type.value), "df"
+        )
 
         assert res.to_dict("records") == [
             {

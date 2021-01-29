@@ -6,16 +6,12 @@ import collections
 
 from .psparser import LIT
 
-LITERAL_DEVICE_GRAY = LIT('DeviceGray')
-LITERAL_DEVICE_RGB = LIT('DeviceRGB')
-LITERAL_DEVICE_CMYK = LIT('DeviceCMYK')
-class PDFColorSpace:
-    def __init__(self, name, ncomponents) -> None:
-        ...
-    
-    def __repr__(self):
-        ...
-    
+LITERAL_DEVICE_GRAY = LIT("DeviceGray")
+LITERAL_DEVICE_RGB = LIT("DeviceRGB")
+LITERAL_DEVICE_CMYK = LIT("DeviceCMYK")
 
+class PDFColorSpace:
+    def __init__(self, name, ncomponents) -> None: ...
+    def __repr__(self): ...
 
 PREDEFINED_COLORSPACE = collections.OrderedDict()

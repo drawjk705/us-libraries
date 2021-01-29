@@ -17,4 +17,3 @@ def rldecode(data):
         denotes EOD.
     """
     ...
-

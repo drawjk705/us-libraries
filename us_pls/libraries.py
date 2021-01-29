@@ -11,6 +11,8 @@ from us_pls._download.models import DatafileType
 from us_pls._logger.configure_logger import DEFAULT_LOG_FILE, configure_logger
 from us_pls._logger.factory import LoggerFactory
 from us_pls._logger.interface import ILoggerFactory
+from us_pls._persistence.interface import IOnDiskCache
+from us_pls._persistence.on_disk_cache import OnDiskCache
 from us_pls._scraper.interface import IScrapingService
 from us_pls._scraper.scraping_service import ScrapingService
 from us_pls._stats.interface import IStatsService
@@ -49,6 +51,7 @@ class PublicLibrariesSurvey:
         container.register(IScrapingService, ScrapingService)
         container.register(IDownloadService, DownloadService)
         container.register(IStatsService, StatsService)
+        container.register(IOnDiskCache, OnDiskCache)
         container.register(LibrariesClient)
 
         configure_logger(log_file, year)

@@ -9,17 +9,22 @@ import pandas as pd
 from us_pls._config import Config
 from us_pls._download.models import DatafileType
 from us_pls._logger.interface import ILoggerFactory
+from us_pls._persistence.interface import IOnDiskCache
 from us_pls._stats.interface import IStatsService
 
 
 class StatsService(IStatsService):
     _config: Config
+    _cache: IOnDiskCache
     _logger: logging.Logger
 
     _documentation: Dict[DatafileType, str]
 
-    def __init__(self, config: Config, logger_factory: ILoggerFactory) -> None:
+    def __init__(
+        self, config: Config, cache: IOnDiskCache, logger_factory: ILoggerFactory
+    ) -> None:
         self._config = config
+        self._cache = cache
         self._logger = logger_factory.get_logger(__name__)
 
         self._documentation = {}
@@ -27,9 +32,10 @@ class StatsService(IStatsService):
     def get_stats(self, _from: DatafileType) -> pd.DataFrame:
         self._logger.debug(f"Getting stats for {_from.value}")
 
-        stats: pd.DataFrame = pd.read_csv(
-            f"{self._config.data_dir}/{self._config.year}/{_from.value}"
-        )
+        stats = self._cache.get(_from.value, "df")
+
+        if stats is None:
+            return pd.DataFrame()
 
         return stats
 
@@ -40,6 +46,10 @@ class StatsService(IStatsService):
 
         documentation = self._documentation.get(on)
 
+        if documentation is None:
+            print("No readme exists for this year")
+            return
+
         print(documentation)
 
     def _get_documentation(self) -> None:
@@ -47,8 +57,11 @@ class StatsService(IStatsService):
             self._logger.debug("Already pulled documentation")
             return
 
-        with open(f"{self._config.data_dir}/{self._config.year}/README.txt", "r") as f:
-            readme_text = f.read()
+        readme = self._cache.get("README.txt", "txt")
+
+        if readme is None:
+            self._logger.debug("No readme exists")
+            return
 
         documentation: List[str] = []
 
@@ -60,7 +73,7 @@ class StatsService(IStatsService):
 
         self._logger.debug("Pulling documentation...")
 
-        for line in readme_text.splitlines(keepends=True):
+        for line in readme.splitlines(keepends=True):
             if line == "\n":
                 consecutive_newline_count += 1
             else:

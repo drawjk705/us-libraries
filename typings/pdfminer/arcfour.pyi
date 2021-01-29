@@ -7,13 +7,8 @@ See https://en.wikipedia.org/wiki/RC4
 This code is in the public domain.
 
 """
+
 class Arcfour:
-    def __init__(self, key) -> None:
-        ...
-    
-    def process(self, data):
-        ...
-    
+    def __init__(self, key) -> None: ...
+    def process(self, data): ...
     encrypt = ...
-
-

@@ -7,8 +7,9 @@ import logging
 from .psparser import LIT
 
 log = logging.getLogger(__name__)
-LITERAL_PAGE = LIT('Page')
-LITERAL_PAGES = LIT('Pages')
+LITERAL_PAGE = LIT("Page")
+LITERAL_PAGES = LIT("Pages")
+
 class PDFPage:
     """An object that holds the information about a page.
 
@@ -29,6 +30,7 @@ class PDFPage:
       annots: the page annotations.
       beads: a chain that represents natural reading order.
     """
+
     def __init__(self, doc, pageid, attrs) -> None:
         """Initialize a page object.
 
@@ -37,18 +39,17 @@ class PDFPage:
         attrs: a dictionary of page attributes.
         """
         ...
-    
-    def __repr__(self):
-        ...
-    
+    def __repr__(self): ...
     INHERITABLE_ATTRS = ...
     @classmethod
-    def create_pages(cls, document):
-        ...
-    
+    def create_pages(cls, document): ...
     @classmethod
-    def get_pages(cls, fp, pagenos=..., maxpages=..., password=..., caching=..., check_extractable=...):
-        ...
-    
-
-
+    def get_pages(
+        cls,
+        fp,
+        pagenos=...,
+        maxpages=...,
+        password=...,
+        caching=...,
+        check_extractable=...,
+    ): ...

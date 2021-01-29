@@ -11,11 +11,13 @@ XML or HTML to reflect a new encoding; that's the tree builder's job.
 """
 __license__ = "MIT"
 chardet_type = None
-xml_encoding = '^\\s*<\\?.*encoding=[\'"](.*?)[\'"].*\\?>'
-html_meta = '<\\s*meta[^>]+charset\\s*=\\s*["\']?([^>]*?)[ /;\'">]'
+xml_encoding = "^\\s*<\\?.*encoding=['\"](.*?)['\"].*\\?>"
+html_meta = "<\\s*meta[^>]+charset\\s*=\\s*[\"']?([^>]*?)[ /;'\">]"
 encoding_res = dict()
+
 class EntitySubstitution(object):
     """The ability to substitute XML or HTML entities for certain characters."""
+
     CHARACTER_TO_XML_ENTITY = ...
     BARE_AMPERSAND_OR_BRACKET = ...
     AMPERSAND_OR_BRACKET = ...
@@ -23,23 +25,22 @@ class EntitySubstitution(object):
     def quoted_attribute_value(self, value):
         """Make a value into a quoted XML attribute, possibly escaping it.
 
-         Most strings will be quoted using double quotes.
+        Most strings will be quoted using double quotes.
 
-          Bob's Bar -> "Bob's Bar"
+         Bob's Bar -> "Bob's Bar"
 
-         If a string contains double quotes, it will be quoted using
-         single quotes.
+        If a string contains double quotes, it will be quoted using
+        single quotes.
 
-          Welcome to "my bar" -> 'Welcome to "my bar"'
+         Welcome to "my bar" -> 'Welcome to "my bar"'
 
-         If a string contains both single and double quotes, the
-         double quotes will be escaped, and the string will be quoted
-         using double quotes.
+        If a string contains both single and double quotes, the
+        double quotes will be escaped, and the string will be quoted
+        using double quotes.
 
-          Welcome to "Bob's Bar" -> "Welcome to &quot;Bob's bar&quot;
+         Welcome to "Bob's Bar" -> "Welcome to &quot;Bob's bar&quot;
         """
         ...
-    
     @classmethod
     def substitute_xml(cls, value, make_quoted_attribute=...):
         """Substitute XML entities for special XML characters.
@@ -54,7 +55,6 @@ class EntitySubstitution(object):
          quoted, as befits an attribute value.
         """
         ...
-    
     @classmethod
     def substitute_xml_containing_entities(cls, value, make_quoted_attribute=...):
         """Substitute XML entities for special XML characters.
@@ -68,7 +68,6 @@ class EntitySubstitution(object):
          quoted, as befits an attribute value.
         """
         ...
-    
     @classmethod
     def substitute_html(cls, s):
         """Replace certain Unicode characters with named HTML entities.
@@ -84,8 +83,6 @@ class EntitySubstitution(object):
         :param s: A Unicode string.
         """
         ...
-    
-
 
 class EncodingDetector:
     """Suggests a number of possible encodings for a bytestring.
@@ -107,7 +104,10 @@ class EncodingDetector:
 
     5. Windows-1252.
     """
-    def __init__(self, markup, override_encodings=..., is_html=..., exclude_encodings=...) -> None:
+
+    def __init__(
+        self, markup, override_encodings=..., is_html=..., exclude_encodings=...
+    ) -> None:
         """Constructor.
 
         :param markup: Some markup in an unknown encoding.
@@ -118,7 +118,6 @@ class EncodingDetector:
             if they otherwise would be.
         """
         ...
-    
     @property
     def encodings(self):
         """Yield a number of encodings that might work for this markup.
@@ -126,7 +125,6 @@ class EncodingDetector:
         :yield: A sequence of strings.
         """
         ...
-    
     @classmethod
     def strip_byte_order_mark(cls, data):
         """If a byte-order mark is present, strip it and return the encoding it implies.
@@ -135,7 +133,6 @@ class EncodingDetector:
         :return: A 2-tuple (modified data, implied encoding)
         """
         ...
-    
     @classmethod
     def find_declared_encoding(cls, markup, is_html=..., search_entire_document=...):
         """Given a document, tries to find its declared encoding.
@@ -153,17 +150,23 @@ class EncodingDetector:
             Set this to True to force this method to search the entire document.
         """
         ...
-    
-
 
 class UnicodeDammit:
     """A class for detecting the encoding of a *ML document and
     converting it to a Unicode string. If the source encoding is
     windows-1252, can replace MS smart quotes with their HTML or XML
     equivalents."""
+
     CHARSET_ALIASES = ...
     ENCODINGS_WITH_SMART_QUOTES = ...
-    def __init__(self, markup, override_encodings=..., smart_quotes_to=..., is_html=..., exclude_encodings=...) -> None:
+    def __init__(
+        self,
+        markup,
+        override_encodings=...,
+        smart_quotes_to=...,
+        is_html=...,
+        exclude_encodings=...,
+    ) -> None:
         """Constructor.
 
         :param markup: A bytestring representing markup in an unknown encoding.
@@ -180,14 +183,12 @@ class UnicodeDammit:
             if the sniffing code thinks they might make sense.
         """
         ...
-    
     @property
     def declared_html_encoding(self):
         """If the markup is an HTML document, returns the encoding declared _within_
         the document.
         """
         ...
-    
     def find_codec(self, charset):
         """Convert the name of a character set to a codec name.
 
@@ -195,7 +196,6 @@ class UnicodeDammit:
         :return: The name of a codec.
         """
         ...
-    
     MS_CHARS = ...
     MS_CHARS_TO_ASCII = ...
     WINDOWS_1252_TO_UTF8 = ...
@@ -221,6 +221,3 @@ class UnicodeDammit:
           equivalents.
         """
         ...
-    
-
-

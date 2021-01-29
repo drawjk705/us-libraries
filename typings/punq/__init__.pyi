@@ -22,15 +22,15 @@ class MissingDependencyException(Exception):
         Traceback (most recent call last):
         punq.MissingDependencyException: Failed to resolve implementation for foo
     """
-    ...
 
+    ...
 
 class InvalidRegistrationException(Exception):
     """
     Raised when a registration would result in an unresolvable service.
     """
-    ...
 
+    ...
 
 class InvalidForwardReferenceException(Exception):
     """
@@ -82,13 +82,12 @@ class InvalidForwardReferenceException(Exception):
         Client(dep=<punq.AlternativeDependency object at 0x...>)
 
     """
-    ...
 
+    ...
 
 class Scope(Enum):
     transient = ...
     singleton = ...
-
 
 class Registration(NamedTuple):
     service: str
@@ -98,42 +97,37 @@ class Registration(NamedTuple):
     args: List[Any]
     ...
 
-
-class Empty:
-    ...
-
+class Empty: ...
 
 empty = Empty()
+
 class Registry:
-    def __init__(self) -> None:
-        ...
-    
+    def __init__(self) -> None: ...
     def register_service_and_impl(self, service, scope, impl, resolve_args):
         """Registers a concrete implementation of an abstract service.
 
-           Examples:
-                In this example, the EmailSender type is an abstract class
-                and SmtpEmailSender is our concrete implementation.
+        Examples:
+             In this example, the EmailSender type is an abstract class
+             and SmtpEmailSender is our concrete implementation.
 
-                >>> from punq import Container
-                >>> container = Container()
+             >>> from punq import Container
+             >>> container = Container()
 
-                >>> class EmailSender:
-                ...     def send(self, msg):
-                ...         pass
-                ...
-                >>> class SmtpEmailSender(EmailSender):
-                ...     def send(self, msg):
-                ...         print("Sending message via smtp: " + msg)
-                ...
-                >>> container.register(EmailSender, SmtpEmailSender)
-                <punq.Container object at 0x...>
-                >>> instance = container.resolve(EmailSender)
-                >>> instance.send("Hello")
-                Sending message via smtp: Hello
+             >>> class EmailSender:
+             ...     def send(self, msg):
+             ...         pass
+             ...
+             >>> class SmtpEmailSender(EmailSender):
+             ...     def send(self, msg):
+             ...         print("Sending message via smtp: " + msg)
+             ...
+             >>> container.register(EmailSender, SmtpEmailSender)
+             <punq.Container object at 0x...>
+             >>> instance = container.resolve(EmailSender)
+             >>> instance.send("Hello")
+             Sending message via smtp: Hello
         """
         ...
-    
     def register_service_and_instance(self, service, instance):
         """Register a singleton instance to implement a service.
 
@@ -159,73 +153,42 @@ class Registry:
             <punq.Container object at 0x...>
         """
         ...
-    
     def register_concrete_service(self, service, scope):
         """Register a service as its own implementation.
 
-            Examples:
-                If we need to register a dependency, but we don't need to
-                abstract it, we can register it as concrete.
+        Examples:
+            If we need to register a dependency, but we don't need to
+            abstract it, we can register it as concrete.
 
-                >>> from punq import Container
-                >>> container = Container()
-                >>> class FileReader:
-                ...     def read(self):
-                ...         # Assorted legerdemain and rigmarole
-                ...         pass
-                ...
-                >>> container.register(FileReader)
-                <punq.Container object at 0x...>
+            >>> from punq import Container
+            >>> container = Container()
+            >>> class FileReader:
+            ...     def read(self):
+            ...         # Assorted legerdemain and rigmarole
+            ...         pass
+            ...
+            >>> container.register(FileReader)
+            <punq.Container object at 0x...>
         """
         ...
-    
-    def build_context(self, key, existing=...):
-        ...
-    
-    def register(self, service, factory=..., instance=..., scope=..., **kwargs):
-        ...
-    
-    def __getitem__(self, service):
-        ...
-    
-
+    def build_context(self, key, existing=...): ...
+    def register(self, service, factory=..., instance=..., scope=..., **kwargs): ...
+    def __getitem__(self, service): ...
 
 class ResolutionTarget:
-    def __init__(self, key, impls) -> None:
-        ...
-    
-    def is_generic_list(self):
-        ...
-    
+    def __init__(self, key, impls) -> None: ...
+    def is_generic_list(self): ...
     @property
-    def generic_parameter(self):
-        ...
-    
-    def next_impl(self):
-        ...
-    
-
+    def generic_parameter(self): ...
+    def next_impl(self): ...
 
 class ResolutionContext:
-    def __init__(self, key, impls) -> None:
-        ...
-    
-    def target(self, key):
-        ...
-    
-    def has_cached(self, key):
-        ...
-    
-    def __getitem__(self, key):
-        ...
-    
-    def __setitem__(self, key, instance):
-        ...
-    
-    def all_registrations(self, service):
-        ...
-    
-
+    def __init__(self, key, impls) -> None: ...
+    def target(self, key): ...
+    def has_cached(self, key): ...
+    def __getitem__(self, key): ...
+    def __setitem__(self, key, instance): ...
+    def all_registrations(self, service): ...
 
 class Container:
     """
@@ -234,9 +197,8 @@ class Container:
     This is the main entrypoint of the Punq library. In normal scenarios users
     will only need to interact with this class.
     """
-    def __init__(self) -> None:
-        ...
-    
+
+    def __init__(self) -> None: ...
     def register(self, service, factory=..., instance=..., scope=..., **kwargs):
         """
         Register a dependency into the container.
@@ -299,7 +261,6 @@ class Container:
             Sending message via smtp
         """
         ...
-    
     def resolve_all(self, service, **kwargs):
         """
         Return all registrations for a given service.
@@ -337,9 +298,4 @@ class Container:
             ...             return authn.authenticate(req)
         """
         ...
-    
-    def resolve(self, service_key, **kwargs):
-        ...
-    
-
-
+    def resolve(self, service_key, **kwargs): ...

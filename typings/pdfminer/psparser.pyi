@@ -6,30 +6,17 @@ import logging
 import re
 
 log = logging.getLogger(__name__)
-class PSException(Exception):
-    ...
 
-
-class PSEOF(PSException):
-    ...
-
-
-class PSSyntaxError(PSException):
-    ...
-
-
-class PSTypeError(PSException):
-    ...
-
-
-class PSValueError(PSException):
-    ...
-
+class PSException(Exception): ...
+class PSEOF(PSException): ...
+class PSSyntaxError(PSException): ...
+class PSTypeError(PSException): ...
+class PSValueError(PSException): ...
 
 class PSObject:
     """Base class for all PS or PDF-related data types."""
-    ...
 
+    ...
 
 class PSLiteral(PSObject):
     """A class that represents a PostScript literal.
@@ -42,13 +29,9 @@ class PSLiteral(PSObject):
     Note: Do not create an instance of PSLiteral directly.
     Always use PSLiteralTable.intern().
     """
-    def __init__(self, name) -> None:
-        ...
-    
-    def __repr__(self):
-        ...
-    
 
+    def __init__(self, name) -> None: ...
+    def __repr__(self): ...
 
 class PSKeyword(PSObject):
     """A class that represents a PostScript keyword.
@@ -60,133 +43,91 @@ class PSKeyword(PSObject):
     Note: Do not create an instance of PSKeyword directly.
     Always use PSKeywordTable.intern().
     """
-    def __init__(self, name) -> None:
-        ...
-    
-    def __repr__(self):
-        ...
-    
 
+    def __init__(self, name) -> None: ...
+    def __repr__(self): ...
 
 class PSSymbolTable:
     """A utility class for storing PSLiteral/PSKeyword objects.
 
     Interned objects can be checked its identity with "is" operator.
     """
-    def __init__(self, klass) -> None:
-        ...
-    
-    def intern(self, name):
-        ...
-    
 
+    def __init__(self, klass) -> None: ...
+    def intern(self, name): ...
 
 PSLiteralTable = PSSymbolTable(PSLiteral)
 PSKeywordTable = PSSymbolTable(PSKeyword)
 LIT = PSLiteralTable.intern
 KWD = PSKeywordTable.intern
-KEYWORD_PROC_BEGIN = KWD(b'{')
-KEYWORD_PROC_END = KWD(b'}')
-KEYWORD_ARRAY_BEGIN = KWD(b'[')
-KEYWORD_ARRAY_END = KWD(b']')
-KEYWORD_DICT_BEGIN = KWD(b'<<')
-KEYWORD_DICT_END = KWD(b'>>')
-def literal_name(x):
-    ...
+KEYWORD_PROC_BEGIN = KWD(b"{")
+KEYWORD_PROC_END = KWD(b"}")
+KEYWORD_ARRAY_BEGIN = KWD(b"[")
+KEYWORD_ARRAY_END = KWD(b"]")
+KEYWORD_DICT_BEGIN = KWD(b"<<")
+KEYWORD_DICT_END = KWD(b">>")
 
-def keyword_name(x):
-    ...
+def literal_name(x): ...
+def keyword_name(x): ...
 
-EOL = re.compile(rb'[\r\n]')
-SPC = re.compile(rb'\s')
-NONSPC = re.compile(rb'\S')
-HEX = re.compile(rb'[0-9a-fA-F]')
-END_LITERAL = re.compile(rb'[#/%\[\]()<>{}\s]')
-END_HEX_STRING = re.compile(rb'[^\s0-9a-fA-F]')
-HEX_PAIR = re.compile(rb'[0-9a-fA-F]{2}|.')
-END_NUMBER = re.compile(rb'[^0-9]')
-END_KEYWORD = re.compile(rb'[#/%\[\]()<>{}\s]')
-END_STRING = re.compile(rb'[()\134]')
-OCT_STRING = re.compile(rb'[0-7]')
-ESC_STRING = { b'b': 8,b't': 9,b'n': 10,b'f': 12,b'r': 13,b'(': 40,b')': 41,b'\\': 92 }
+EOL = re.compile(rb"[\r\n]")
+SPC = re.compile(rb"\s")
+NONSPC = re.compile(rb"\S")
+HEX = re.compile(rb"[0-9a-fA-F]")
+END_LITERAL = re.compile(rb"[#/%\[\]()<>{}\s]")
+END_HEX_STRING = re.compile(rb"[^\s0-9a-fA-F]")
+HEX_PAIR = re.compile(rb"[0-9a-fA-F]{2}|.")
+END_NUMBER = re.compile(rb"[^0-9]")
+END_KEYWORD = re.compile(rb"[#/%\[\]()<>{}\s]")
+END_STRING = re.compile(rb"[()\134]")
+OCT_STRING = re.compile(rb"[0-7]")
+ESC_STRING = {
+    b"b": 8,
+    b"t": 9,
+    b"n": 10,
+    b"f": 12,
+    b"r": 13,
+    b"(": 40,
+    b")": 41,
+    b"\\": 92,
+}
+
 class PSBaseParser:
-    """Most basic PostScript parser that performs only tokenization.
-    """
+    """Most basic PostScript parser that performs only tokenization."""
+
     BUFSIZ = ...
-    def __init__(self, fp) -> None:
-        ...
-    
-    def __repr__(self):
-        ...
-    
-    def flush(self):
-        ...
-    
-    def close(self):
-        ...
-    
-    def tell(self):
-        ...
-    
-    def poll(self, pos=..., n=...):
-        ...
-    
+    def __init__(self, fp) -> None: ...
+    def __repr__(self): ...
+    def flush(self): ...
+    def close(self): ...
+    def tell(self): ...
+    def poll(self, pos=..., n=...): ...
     def seek(self, pos):
-        """Seeks the parser to the given position.
-        """
+        """Seeks the parser to the given position."""
         ...
-    
-    def fillbuf(self):
-        ...
-    
+    def fillbuf(self): ...
     def nextline(self):
-        """Fetches a next line that ends either with \\r or \\n.
-        """
+        """Fetches a next line that ends either with \\r or \\n."""
         ...
-    
     def revreadlines(self):
         """Fetches a next line backword.
 
         This is used to locate the trailers at the end of a file.
         """
         ...
-    
-    def nexttoken(self):
-        ...
-    
-
+    def nexttoken(self): ...
 
 class PSStackParser(PSBaseParser):
-    def __init__(self, fp) -> None:
-        ...
-    
-    def reset(self):
-        ...
-    
-    def seek(self, pos):
-        ...
-    
-    def push(self, *objs):
-        ...
-    
-    def pop(self, n):
-        ...
-    
-    def popall(self):
-        ...
-    
-    def add_results(self, *objs):
-        ...
-    
-    def start_type(self, pos, type):
-        ...
-    
-    def end_type(self, type):
-        ...
-    
-    def do_keyword(self, pos, token):
-        ...
-    
+    def __init__(self, fp) -> None: ...
+    def reset(self): ...
+    def seek(self, pos): ...
+    def push(self, *objs): ...
+    def pop(self, n): ...
+    def popall(self): ...
+    def add_results(self, *objs): ...
+    def start_type(self, pos, type): ...
+    def end_type(self, type): ...
+    def do_keyword(self, pos, token): ...
     def nextobject(self):
         """Yields a list of objects.
 
@@ -196,6 +137,3 @@ class PSStackParser(PSBaseParser):
         :return: keywords, literals, strings, numbers, arrays and dictionaries.
         """
         ...
-    
-
-

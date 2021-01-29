@@ -6,6 +6,7 @@ from urllib.parse import uses_netloc, uses_params, uses_relative
 
 _VALID_URLS = set(uses_relative + uses_netloc + uses_params)
 MAX_FILE_SIZE = 200
+
 def localize_file(path_or_buffer, user_agent=..., suffix=...):
     """Ensure localize target file.
 
@@ -38,4 +39,3 @@ def is_file_like(obj):
         bool: file like object or not
     """
     ...
-

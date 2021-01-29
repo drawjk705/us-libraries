@@ -8,9 +8,8 @@ from .pdftypes import PDFException
 from .psparser import PSStackParser
 
 log = logging.getLogger(__name__)
-class PDFSyntaxError(PDFException):
-    ...
 
+class PDFSyntaxError(PDFException): ...
 
 class PDFParser(PSStackParser):
     """
@@ -28,13 +27,11 @@ class PDFParser(PSStackParser):
       parser.nextobject()
 
     """
-    def __init__(self, fp) -> None:
-        ...
-    
+
+    def __init__(self, fp) -> None: ...
     def set_document(self, doc):
         """Associates the parser with a PDFDocument object."""
         ...
-    
     KEYWORD_R = ...
     KEYWORD_NULL = ...
     KEYWORD_ENDOBJ = ...
@@ -44,8 +41,6 @@ class PDFParser(PSStackParser):
     def do_keyword(self, pos, token):
         """Handles PDF-related keywords."""
         ...
-    
-
 
 class PDFStreamParser(PDFParser):
     """
@@ -55,15 +50,8 @@ class PDFStreamParser(PDFParser):
     needed because a PDF content stream can also have
     indirect references to other objects in the same document.
     """
-    def __init__(self, data) -> None:
-        ...
-    
-    def flush(self):
-        ...
-    
+
+    def __init__(self, data) -> None: ...
+    def flush(self): ...
     KEYWORD_OBJ = ...
-    def do_keyword(self, pos, token):
-        ...
-    
-
-
+    def do_keyword(self, pos, token): ...

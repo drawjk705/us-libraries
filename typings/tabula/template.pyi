@@ -13,4 +13,3 @@ def load_template(path_or_buffer):
         dict: tabula-py options
     """
     ...
-

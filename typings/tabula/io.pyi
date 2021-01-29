@@ -27,9 +27,22 @@ logger = getLogger(__name__)
 TABULA_JAVA_VERSION = "1.0.4"
 JAR_NAME = "tabula-{}-jar-with-dependencies.jar".format(TABULA_JAVA_VERSION)
 JAR_DIR = os.path.abspath(os.path.dirname(__file__))
-JAVA_NOT_FOUND_ERROR = "`java` command is not found from this Python process." "Please ensure Java is installed and PATH is set for `java`"
-DEFAULT_CONFIG = { "JAR_PATH": os.path.join(JAR_DIR, JAR_NAME) }
-def read_pdf(input_path, output_format=..., encoding=..., java_options=..., pandas_options=..., multiple_tables=..., user_agent=..., **kwargs):
+JAVA_NOT_FOUND_ERROR = (
+    "`java` command is not found from this Python process."
+    "Please ensure Java is installed and PATH is set for `java`"
+)
+DEFAULT_CONFIG = {"JAR_PATH": os.path.join(JAR_DIR, JAR_NAME)}
+
+def read_pdf(
+    input_path,
+    output_format=...,
+    encoding=...,
+    java_options=...,
+    pandas_options=...,
+    multiple_tables=...,
+    user_agent=...,
+    **kwargs
+):
     """Read tables in PDF.
 
     Args:
@@ -207,7 +220,15 @@ def read_pdf(input_path, output_format=..., encoding=..., java_options=..., pand
     """
     ...
 
-def read_pdf_with_template(input_path, template_path, pandas_options=..., encoding=..., java_options=..., user_agent=..., **kwargs):
+def read_pdf_with_template(
+    input_path,
+    template_path,
+    pandas_options=...,
+    encoding=...,
+    java_options=...,
+    user_agent=...,
+    **kwargs
+):
     """Read tables in PDF with a Tabula App template.
 
     Args:
@@ -322,7 +343,9 @@ def read_pdf_with_template(input_path, template_path, pandas_options=..., encodi
     """
     ...
 
-def convert_into(input_path, output_path, output_format=..., java_options=..., **kwargs):
+def convert_into(
+    input_path, output_path, output_format=..., java_options=..., **kwargs
+):
     """Convert tables from PDF into a file.
     Output file will be saved into `output_path`.
 
@@ -387,7 +410,21 @@ def convert_into_by_batch(input_dir, output_format=..., java_options=..., **kwar
     """
     ...
 
-def build_options(pages=..., guess=..., area=..., relative_area=..., lattice=..., stream=..., password=..., silent=..., columns=..., format=..., batch=..., output_path=..., options=...):
+def build_options(
+    pages=...,
+    guess=...,
+    area=...,
+    relative_area=...,
+    lattice=...,
+    stream=...,
+    password=...,
+    silent=...,
+    columns=...,
+    format=...,
+    batch=...,
+    output_path=...,
+    options=...,
+):
     """Build options for tabula-java
 
     Args:
@@ -456,4 +493,3 @@ def build_options(pages=..., guess=..., area=..., relative_area=..., lattice=...
             Built list of options
     """
     ...
-

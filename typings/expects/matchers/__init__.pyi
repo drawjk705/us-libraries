@@ -48,6 +48,7 @@ For more complex matchers you can override the :class:`Matcher`
 methods in order to achieve the needed behavior.
 
 """
+
 class Matcher(object):
     """The :class:`Matcher` class is the base class for all `Expects`
     matchers.
@@ -55,6 +56,7 @@ class Matcher(object):
     It defines a set of methods to ease writting new matchers.
 
     """
+
     def __repr__(self):
         """Returns a string with the description of the matcher.
 
@@ -69,33 +71,15 @@ class Matcher(object):
 
         """
         ...
-    
-    def __and__(self, other):
-        ...
-    
-    def __or__(self, other):
-        ...
-    
+    def __and__(self, other): ...
+    def __or__(self, other): ...
 
-
-def default_matcher(value):
-    ...
+def default_matcher(value): ...
 
 class _And(Matcher):
-    def __init__(self, op1, op2) -> None:
-        ...
-    
-    def __repr__(self):
-        ...
-    
-
+    def __init__(self, op1, op2) -> None: ...
+    def __repr__(self): ...
 
 class _Or(Matcher):
-    def __init__(self, op1, op2) -> None:
-        ...
-    
-    def __repr__(self):
-        ...
-    
-
-
+    def __init__(self, op1, op2) -> None: ...
+    def __repr__(self): ...

@@ -11,10 +11,23 @@ from collections import Counter
 
 from .builder import ParserRejectedMarkup, builder_registry
 from .dammit import UnicodeDammit
-from .element import (DEFAULT_OUTPUT_ENCODING, PYTHON_SPECIFIC_ENCODINGS,
-                      CData, Comment, Declaration, Doctype, NavigableString,
-                      PageElement, ProcessingInstruction, ResultSet, Script,
-                      SoupStrainer, Stylesheet, Tag, TemplateString)
+from .element import (
+    DEFAULT_OUTPUT_ENCODING,
+    PYTHON_SPECIFIC_ENCODINGS,
+    CData,
+    Comment,
+    Declaration,
+    Doctype,
+    NavigableString,
+    PageElement,
+    ProcessingInstruction,
+    ResultSet,
+    Script,
+    SoupStrainer,
+    Stylesheet,
+    Tag,
+    TemplateString,
+)
 
 """Beautiful Soup Elixir and Tonic - "The Screen-Scraper's Friend".
 
@@ -35,20 +48,21 @@ __author__ = "Leonard Richardson (leonardr@segfault.org)"
 __version__ = "4.9.3"
 __copyright__ = "Copyright (c) 2004-2020 Leonard Richardson"
 __license__ = "MIT"
+
 class GuessedAtParserWarning(UserWarning):
     """The warning issued when BeautifulSoup has to guess what parser to
     use -- probably because no parser was specified in the constructor.
     """
-    ...
 
+    ...
 
 class MarkupResemblesLocatorWarning(UserWarning):
     """The warning issued when BeautifulSoup is given 'markup' that
     actually looks like a resource locator -- a URL or a path to a file
     on disk.
     """
-    ...
 
+    ...
 
 class BeautifulSoup(Tag):
     """A data structure representing a parsed HTML or XML document.
@@ -80,11 +94,22 @@ class BeautifulSoup(Tag):
     like HTML's <br> tag), call handle_starttag and then
     handle_endtag.
     """
+
     ROOT_TAG_NAME = ...
     DEFAULT_BUILDER_FEATURES = ...
     ASCII_SPACES = ...
     NO_PARSER_SPECIFIED_WARNING = ...
-    def __init__(self, markup=..., features=..., builder=..., parse_only=..., from_encoding=..., exclude_encodings=..., element_classes=..., **kwargs) -> None:
+    def __init__(
+        self,
+        markup=...,
+        features=...,
+        builder=...,
+        parse_only=...,
+        from_encoding=...,
+        exclude_encodings=...,
+        element_classes=...,
+        **kwargs
+    ) -> None:
         """Constructor.
 
         :param markup: A string or a file-like object representing
@@ -128,7 +153,7 @@ class BeautifulSoup(Tag):
          Beautiful Soup 3. None of these arguments do anything in
          Beautiful Soup 4; they will result in a warning and then be
          ignored.
-         
+
          Apart from this, any keyword arguments passed into the
          BeautifulSoup constructor are propagated to the TreeBuilder
          constructor. This makes it possible to configure a
@@ -136,21 +161,25 @@ class BeautifulSoup(Tag):
          one to use.
         """
         ...
-    
     def __copy__(self):
         """Copy a BeautifulSoup object by converting the document to a string and parsing it again."""
         ...
-    
-    def __getstate__(self):
-        ...
-    
+    def __getstate__(self): ...
     def reset(self):
         """Reset this object to a state as though it had never parsed any
         markup.
         """
         ...
-    
-    def new_tag(self, name, namespace=..., nsprefix=..., attrs=..., sourceline=..., sourcepos=..., **kwattrs):
+    def new_tag(
+        self,
+        name,
+        namespace=...,
+        nsprefix=...,
+        attrs=...,
+        sourceline=...,
+        sourcepos=...,
+        **kwattrs
+    ):
         """Create a new Tag associated with this BeautifulSoup object.
 
         :param name: The name of the new Tag.
@@ -167,47 +196,39 @@ class BeautifulSoup(Tag):
 
         """
         ...
-    
-    def string_container(self, base_class=...):
-        ...
-    
+    def string_container(self, base_class=...): ...
     def new_string(self, s, subclass=...):
         """Create a new NavigableString associated with this BeautifulSoup
         object.
         """
         ...
-    
     def insert_before(self, *args):
         """This method is part of the PageElement API, but `BeautifulSoup` doesn't implement
         it because there is nothing before or after it in the parse tree.
         """
         ...
-    
     def insert_after(self, *args):
         """This method is part of the PageElement API, but `BeautifulSoup` doesn't implement
         it because there is nothing before or after it in the parse tree.
         """
         ...
-    
     def popTag(self):
         """Internal method called by _popToTag when a tag is closed."""
         ...
-    
     def pushTag(self, tag):
         """Internal method called by handle_starttag when a tag is opened."""
         ...
-    
     def endData(self, containerClass=...):
         """Method called by the TreeBuilder when the end of a data segment
         occurs.
         """
         ...
-    
     def object_was_parsed(self, o, parent=..., most_recent_element=...):
         """Method called by the TreeBuilder to integrate an object into the parse tree."""
         ...
-    
-    def handle_starttag(self, name, namespace, nsprefix, attrs, sourceline=..., sourcepos=...):
+    def handle_starttag(
+        self, name, namespace, nsprefix, attrs, sourceline=..., sourcepos=...
+    ):
         """Called by the tree builder when a new tag is encountered.
 
         :param name: Name of the tag.
@@ -224,7 +245,6 @@ class BeautifulSoup(Tag):
         don't call handle_endtag.
         """
         ...
-    
     def handle_endtag(self, name, nsprefix=...):
         """Called by the tree builder when an ending tag is encountered.
 
@@ -232,11 +252,9 @@ class BeautifulSoup(Tag):
         :param nsprefix: Namespace prefix for the tag.
         """
         ...
-    
     def handle_data(self, data):
         """Called by the tree builder when a chunk of textual data is encountered."""
         ...
-    
     def decode(self, pretty_print=..., eventual_encoding=..., formatter=...):
         """Returns a string or Unicode representation of the parse tree
             as an HTML or XML document.
@@ -247,29 +265,26 @@ class BeautifulSoup(Tag):
             If this is None, the document will be a Unicode string.
         """
         ...
-    
-
 
 _s = BeautifulSoup
 _soup = BeautifulSoup
+
 class BeautifulStoneSoup(BeautifulSoup):
     """Deprecated interface to an XML parser."""
-    def __init__(self, *args, **kwargs) -> None:
-        ...
-    
 
+    def __init__(self, *args, **kwargs) -> None: ...
 
 class StopParsing(Exception):
     """Exception raised by a TreeBuilder if it's unable to continue parsing."""
-    ...
 
+    ...
 
 class FeatureNotFound(ValueError):
     """Exception raised by the BeautifulSoup constructor if no parser with the
     requested features is found.
     """
+
     ...
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     soup = BeautifulSoup(sys.stdin)

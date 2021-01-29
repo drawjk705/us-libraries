@@ -6,25 +6,31 @@ import itertools
 import sys
 from collections import defaultdict
 
-from bs4.element import (CharsetMetaAttributeValue, ContentMetaAttributeValue,
-                         Script, Stylesheet, TemplateString, nonwhitespace_re)
+from bs4.element import (
+    CharsetMetaAttributeValue,
+    ContentMetaAttributeValue,
+    Script,
+    Stylesheet,
+    TemplateString,
+    nonwhitespace_re,
+)
 
 from . import _htmlparser
 
 __license__ = "MIT"
-FAST = 'fast'
-PERMISSIVE = 'permissive'
-STRICT = 'strict'
-XML = 'xml'
-HTML = 'html'
-HTML_5 = 'html5'
+FAST = "fast"
+PERMISSIVE = "permissive"
+STRICT = "strict"
+XML = "xml"
+HTML = "html"
+HTML_5 = "html5"
+
 class TreeBuilderRegistry(object):
     """A way of looking up TreeBuilder subclasses by their name or by desired
     features.
     """
-    def __init__(self) -> None:
-        ...
-    
+
+    def __init__(self) -> None: ...
     def register(self, treebuilder_class):
         """Register a treebuilder based on its advertised features.
 
@@ -32,7 +38,6 @@ class TreeBuilderRegistry(object):
            attribute should list its features.
         """
         ...
-    
     def lookup(self, *features):
         """Look up a TreeBuilder subclass with the desired features.
 
@@ -43,12 +48,12 @@ class TreeBuilderRegistry(object):
             registered subclass with all the requested features.
         """
         ...
-    
-
 
 builder_registry = TreeBuilderRegistry()
+
 class TreeBuilder(object):
     """Turn a textual document into a Beautiful Soup object tree."""
+
     NAME = ...
     ALTERNATE_NAMES = ...
     features = ...
@@ -60,7 +65,13 @@ class TreeBuilder(object):
     DEFAULT_STRING_CONTAINERS = ...
     USE_DEFAULT = ...
     TRACKS_LINE_NUMBERS = ...
-    def __init__(self, multi_valued_attributes=..., preserve_whitespace_tags=..., store_line_numbers=..., string_containers=...) -> None:
+    def __init__(
+        self,
+        multi_valued_attributes=...,
+        preserve_whitespace_tags=...,
+        store_line_numbers=...,
+        string_containers=...,
+    ) -> None:
         """Constructor.
 
         :param multi_valued_attributes: If this is set to None, the
@@ -88,12 +99,11 @@ class TreeBuilder(object):
          line numbers and positions of the original markup, that
          information will, by default, be stored in each corresponding
          `Tag` object. You can turn this off by passing
-         store_line_numbers=False. If the parser you're using doesn't 
+         store_line_numbers=False. If the parser you're using doesn't
          keep track of this information, then setting store_line_numbers=True
          will do nothing.
         """
         ...
-    
     def initialize_soup(self, soup):
         """The BeautifulSoup object has been initialized and is now
         being associated with the TreeBuilder.
@@ -101,7 +111,6 @@ class TreeBuilder(object):
         :param soup: A BeautifulSoup object.
         """
         ...
-    
     def reset(self):
         """Do any work necessary to reset the underlying parser
         for a new document.
@@ -109,7 +118,6 @@ class TreeBuilder(object):
         By default, this does nothing.
         """
         ...
-    
     def can_be_empty_element(self, tag_name):
         """Might a tag with this name be an empty-element tag?
 
@@ -130,7 +138,6 @@ class TreeBuilder(object):
         :param tag_name: The name of a markup tag.
         """
         ...
-    
     def feed(self, markup):
         """Run some incoming markup through some parsing process,
         populating the `BeautifulSoup` object in self.soup.
@@ -141,8 +148,13 @@ class TreeBuilder(object):
         :return: None.
         """
         ...
-    
-    def prepare_markup(self, markup, user_specified_encoding=..., document_declared_encoding=..., exclude_encodings=...):
+    def prepare_markup(
+        self,
+        markup,
+        user_specified_encoding=...,
+        document_declared_encoding=...,
+        exclude_encodings=...,
+    ):
         """Run any preliminary steps necessary to make incoming markup
         acceptable to the parser.
 
@@ -158,7 +170,7 @@ class TreeBuilder(object):
           has undergone character replacement)
 
          Each 4-tuple represents a strategy for converting the
-         document to Unicode and parsing it. Each strategy will be tried 
+         document to Unicode and parsing it. Each strategy will be tried
          in turn.
 
          By default, the only strategy is to parse the markup
@@ -167,7 +179,6 @@ class TreeBuilder(object):
          account the quirks of particular parsers.
         """
         ...
-    
     def test_fragment_to_document(self, fragment):
         """Wrap an HTML fragment to make it look like a document.
 
@@ -183,9 +194,8 @@ class TreeBuilder(object):
         :return: A string -- a full HTML document.
         """
         ...
-    
     def set_up_substitutions(self, tag):
-        """Set up any substitutions that will need to be performed on 
+        """Set up any substitutions that will need to be performed on
         a `Tag` when it's output as a string.
 
         By default, this does nothing. See `HTMLTreeBuilder` for a
@@ -195,8 +205,6 @@ class TreeBuilder(object):
         :return: Whether or not a substitution was performed.
         """
         ...
-    
-
 
 class SAXTreeBuilder(TreeBuilder):
     """A Beautiful Soup treebuilder that listens for SAX events.
@@ -204,46 +212,25 @@ class SAXTreeBuilder(TreeBuilder):
     This is not currently used for anything, but it demonstrates
     how a simple TreeBuilder would work.
     """
-    def feed(self, markup):
-        ...
-    
-    def close(self):
-        ...
-    
-    def startElement(self, name, attrs):
-        ...
-    
-    def endElement(self, name):
-        ...
-    
-    def startElementNS(self, nsTuple, nodeName, attrs):
-        ...
-    
-    def endElementNS(self, nsTuple, nodeName):
-        ...
-    
-    def startPrefixMapping(self, prefix, nodeValue):
-        ...
-    
-    def endPrefixMapping(self, prefix):
-        ...
-    
-    def characters(self, content):
-        ...
-    
-    def startDocument(self):
-        ...
-    
-    def endDocument(self):
-        ...
-    
 
+    def feed(self, markup): ...
+    def close(self): ...
+    def startElement(self, name, attrs): ...
+    def endElement(self, name): ...
+    def startElementNS(self, nsTuple, nodeName, attrs): ...
+    def endElementNS(self, nsTuple, nodeName): ...
+    def startPrefixMapping(self, prefix, nodeValue): ...
+    def endPrefixMapping(self, prefix): ...
+    def characters(self, content): ...
+    def startDocument(self): ...
+    def endDocument(self): ...
 
 class HTMLTreeBuilder(TreeBuilder):
     """This TreeBuilder knows facts about HTML.
 
     Such as which tags are empty-element tags.
     """
+
     empty_element_tags = ...
     block_elements = ...
     DEFAULT_STRING_CONTAINERS = ...
@@ -261,8 +248,6 @@ class HTMLTreeBuilder(TreeBuilder):
         :return: Whether or not a substitution was performed.
         """
         ...
-    
-
 
 def register_treebuilders_from(module):
     """Copy TreeBuilders from the given module into this module."""
@@ -272,11 +257,9 @@ class ParserRejectedMarkup(Exception):
     """An Exception to be raised when the underlying parser simply
     refuses to parse the given markup.
     """
+
     def __init__(self, message_or_exception) -> None:
         """Explain why the parser rejected the given markup, either
         with a textual explanation or another exception.
         """
         ...
-    
-
-

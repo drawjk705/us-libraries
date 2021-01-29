@@ -9,6 +9,7 @@ import re
 This code is in the public domain.
 
 """
+
 def ascii85decode(data):
     """
     In ASCII85 encoding, every four bytes are encoded with five ASCII
@@ -22,8 +23,9 @@ def ascii85decode(data):
     """
     ...
 
-hex_re = re.compile(rb'([a-f\d]{2})', re.IGNORECASE)
-trail_re = re.compile(rb'^(?:[a-f\d]{2}|\s)*([a-f\d])[\s>]*$', re.IGNORECASE)
+hex_re = re.compile(rb"([a-f\d]{2})", re.IGNORECASE)
+trail_re = re.compile(rb"^(?:[a-f\d]{2}|\s)*([a-f\d])[\s>]*$", re.IGNORECASE)
+
 def asciihexdecode(data):
     """
     ASCIIHexDecode filter: PDFReference v1.4 section 3.3.1
@@ -35,4 +37,3 @@ def asciihexdecode(data):
     will behave as if a 0 followed the last digit.
     """
     ...
-
