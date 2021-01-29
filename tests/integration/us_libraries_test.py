@@ -2,11 +2,11 @@ import json
 import os
 import shutil
 from pathlib import Path
-from typing import Any, Callable, Generator, List
+from typing import Any, Generator, List
 
-import pandas
 import pytest
 import requests
+from _pytest.capture import CaptureFixture
 from pytest_mock.plugin import MockerFixture
 
 from tests.integration.expected_stat_columns import (
@@ -15,6 +15,7 @@ from tests.integration.expected_stat_columns import (
     EXPECTED_SYS_DATA_COLS,
 )
 from tests.utils import MockRes, shuffled_cases
+from us_libraries._download.models import DatafileType
 from us_libraries.libraries import Libraries
 
 
@@ -212,38 +213,58 @@ def test_given_download_returns_400(mocker: MockerFixture):
         Libraries(2017)
 
 
-def _test_stats_lambda_helper(
-    fn: Callable[[Libraries], pandas.DataFrame]
-) -> Callable[[Libraries], pandas.DataFrame]:
-    return fn
-
-
 @pytest.mark.integration
 @pytest.mark.parametrize(
-    "stats_fn, expected_columns",
+    "datafile_type, expected_columns",
     [
         (
-            _test_stats_lambda_helper(lambda lib: lib.get_outlet_data()),
+            DatafileType.OutletData,
             EXPECTED_OUTLET_DATA_COLS,
         ),
         (
-            _test_stats_lambda_helper(lambda lib: lib.get_state_summary_data()),
+            DatafileType.StateSummaryAndCharacteristicData,
             EXPECTED_STATE_SUM_COLS,
         ),
         (
-            _test_stats_lambda_helper(lambda lib: lib.get_system_data()),
+            DatafileType.SystemData,
             EXPECTED_SYS_DATA_COLS,
         ),
     ],
 )
-def test_stats(
-    stats_fn: Callable[[Libraries], pandas.DataFrame], expected_columns: List[str]
+def test_stats(datafile_type: DatafileType, expected_columns: List[str]):
+    lib = Libraries(2017)
+
+    columns = lib.get_stats(datafile_type).columns.tolist()
+
+    assert columns == expected_columns
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize(
+    "datafile_type, expected_value",
+    [
+        (
+            DatafileType.OutletData,
+            "Public Library Outlet Data File includes a total of 17,452 total records. The file includes identifying information and a few basic data items for public library service outlets (central, branch, bookmobile, and books-by-mail-only outlets). The data for each outlet consist of one record, except where a single outlet represents multiple bookmobiles. For these outlets, a single record includes information for all bookmobiles and the variable L_NUM_BM indicates the number of associated bookmobiles.  The file includes 96 records for outlets that were reported as closed or were temporarily closed for FY 2017 (STATSTRU, Structure Change Code, is '03' or '23'). Records for public libraries that were closed for the current year are included in the file for that year only. The closed records are not included in the appendix tables of the data documentation or the Supplementary Tables. Data for the closed records are set to a value of -3 (closed or temporarily closed outlet), with flag U_17.\n",
+        ),
+        (
+            DatafileType.StateSummaryAndCharacteristicData,
+            "Public Library State Summary/State Characteristics Data File includes one record (a total of 54 records are in the data file) for each state and outlying area. All libraries, including those that do not conform to the FSCS definition of a public library, are included in the aggregate counts on the State Summary/State Characteristics Data File. For this reason, the Public Library System Data File is the primary source for producing the publication tables because libraries that do not meet the FSCS definition can be excluded from the aggregations. The State Summary/State Characteristics file includes: \n    a. State summary data. These are the totals of the numeric data from the public-use Public Library System Data File for each state and outlying area. \n    b. State characteristics data. These data consist of four items reported by each state and outlying area in a 'state characteristics' record: (1) the earliest reporting period starting date and (2) the latest reporting period ending date for their public libraries, (3) the state population estimate, and (4) the total unduplicated population of legal service areas in the state.\n",
+        ),
+        (
+            DatafileType.SystemData,
+            "Public Library System Data File. This file, also known as the Administrative Entity or AE file, includes a total of 9,245 records. Each library's data consist of one record. The file includes 29 records for administrative entities that were reported as closed or were temporarily closed for FY 2017 (STATSTRU, Structure Change Code, is '03' or '23'). Records for public libraries that were closed for the current year are included in the file for that year only. The closed records are not included in the appendix tables of the data documentation or the Supplementary Tables. Data for the closed records are set to a value of -3 (closed or temporarily closed administrative entity), with flag U_17.\n",
+        ),
+    ],
+)
+def test_read_docs(
+    capsys: CaptureFixture[str], datafile_type: DatafileType, expected_value: str
 ):
     lib = Libraries(2017)
 
-    columns = stats_fn(lib).columns.tolist()
+    lib.read_docs(on=datafile_type)
 
-    assert columns == expected_columns
+    assert capsys.readouterr().out == expected_value
 
 
 @pytest.mark.integration

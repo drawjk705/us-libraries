@@ -54,6 +54,8 @@ class DownloadService(IDownloadService):
             DownloadType.DataElementDefinitions,
         )
 
+        self._clean_up_readme()
+
     def _try_download_resource(
         self, scraped_dict: Dict[str, str], resource: str, download_type: DownloadType
     ) -> None:
@@ -67,7 +69,7 @@ class DownloadService(IDownloadService):
 
         if self._resource_already_exists(download_type):
             self._logger.debug(
-                f"Resources have already been downloaded for {download_type}"
+                f"Resources have already been downloaded for {download_type.value}"
             )
             return
 
@@ -117,24 +119,48 @@ class DownloadService(IDownloadService):
             os.remove(path)
 
     def _move_content(self) -> None:
-        for directory in self._data_prefix.iterdir():
-            if not directory.is_dir():
+        for path in self._data_prefix.iterdir():
+            if not path.is_dir():
+                self._rename(path)
                 continue
-            for sub_path in directory.iterdir():
-                new_name: str = sub_path.name
-                if "_ae_" in sub_path.name.lower():
-                    new_name = DatafileType.SystemData.value
-                elif "_outlet_" in sub_path.name.lower():
-                    new_name = DatafileType.OutletData.value
-                elif "_state_" in sub_path.name.lower():
-                    new_name = DatafileType.StateSummaryAndCharacteristicData.value
-                elif "readme" in sub_path.name.lower():
-                    new_name = "README.txt"
 
-                os.rename(sub_path, self._data_prefix / new_name)
-            os.rmdir(directory)
+            for sub_path in path.iterdir():
+                self._rename(sub_path)
+            os.rmdir(path)
+
+    def _rename(self, path: Path) -> None:
+        new_name: str = path.name
+        if "_ae_" in path.name.lower():
+            new_name = DatafileType.SystemData.value
+        elif "_outlet_" in path.name.lower():
+            new_name = DatafileType.OutletData.value
+        elif "_state_" in path.name.lower():
+            new_name = DatafileType.StateSummaryAndCharacteristicData.value
+        elif "readme" in path.name.lower():
+            new_name = "README.txt"
+
+        os.rename(path, self._data_prefix / new_name)
 
     def _setup_data_dir(self) -> None:
         self._data_prefix = Path(f"{self._config.data_dir}/{self._config.year}")
 
         self._data_prefix.mkdir(parents=True, exist_ok=True)
+
+    def _clean_up_readme(self):
+        with open(
+            f"{self._config.data_dir}/{self._config.year}/README.txt",
+            "r",
+            encoding="utf-8",
+            errors="surrogateescape",
+        ) as f:
+            readme_text = f.read()
+
+        cleaned_readme_text = "".join([c if ord(c) < 128 else "'" for c in readme_text])
+
+        with open(
+            f"{self._config.data_dir}/{self._config.year}/README.txt",
+            "w",
+            encoding="utf-8",
+            errors="surrogateescape",
+        ) as f:
+            f.write(cleaned_readme_text)

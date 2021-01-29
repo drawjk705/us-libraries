@@ -55,6 +55,7 @@ class TestDownloadService(ApiServiceTestFixture[LightDownloadService]):
         mock_try_download = self.mocker.patch.object(
             self._service, "_try_download_resource"
         )
+        self.mocker.patch.object(self._service, "_clean_up_readme")
 
         self._service.download()
 

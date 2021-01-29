@@ -54,7 +54,7 @@ class TestStatsService(ServiceTestFixture[LightStatsService]):
     ):
         mock_read_csv.return_value = read_csv_retval
 
-        res = self._service._get_stats(datafile_type)
+        res = self._service.get_stats(datafile_type)
 
         mock_read_csv.assert_called_once_with(String() & EndsWith(datafile_type.value))
 

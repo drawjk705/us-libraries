@@ -3,6 +3,7 @@ import logging
 import pandas as pd
 
 from us_libraries._download.interface import IDownloadService
+from us_libraries._download.models import DatafileType
 from us_libraries._logger.interface import ILoggerFactory
 from us_libraries._stats.interface import IStatsService
 
@@ -24,14 +25,11 @@ class LibrariesClient:
 
         self.__init_client()
 
-    def get_state_summary_data(self) -> pd.DataFrame:
-        return self._stats_service.get_state_summary_data()
+    def get_stats(self, _from: DatafileType) -> pd.DataFrame:
+        return self._stats_service.get_stats(_from)
 
-    def get_system_data(self) -> pd.DataFrame:
-        return self._stats_service.get_system_data()
-
-    def get_outlet_data(self) -> pd.DataFrame:
-        return self._stats_service.get_outlet_data()
+    def read_docs(self, on: DatafileType) -> None:
+        self._stats_service.read_docs(on)
 
     def __init_client(self) -> None:
         # download the resources needed to

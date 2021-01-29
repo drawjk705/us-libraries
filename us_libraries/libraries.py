@@ -7,6 +7,7 @@ from us_libraries._client import LibrariesClient
 from us_libraries._config import DEFAULT_DATA_DIR, Config
 from us_libraries._download.download_service import DownloadService
 from us_libraries._download.interface import IDownloadService
+from us_libraries._download.models import DatafileType
 from us_libraries._logger.configure_logger import DEFAULT_LOG_FILE, configure_logger
 from us_libraries._logger.factory import LoggerFactory
 from us_libraries._logger.interface import ILoggerFactory
@@ -54,14 +55,11 @@ class Libraries:
 
         self._client = container.resolve(LibrariesClient)
 
-    def get_state_summary_data(self) -> pd.DataFrame:
-        return self._client.get_state_summary_data()
+    def get_stats(self, _from: DatafileType) -> pd.DataFrame:
+        return self._client.get_stats(_from)
 
-    def get_system_data(self) -> pd.DataFrame:
-        return self._client.get_system_data()
-
-    def get_outlet_data(self) -> pd.DataFrame:
-        return self._client.get_outlet_data()
+    def read_docs(self, on: DatafileType) -> None:
+        return self._client.read_docs(on)
 
     def __repr__(self) -> str:
         return f"<Libraries {self._config.year}>"

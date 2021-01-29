@@ -2,16 +2,14 @@ from abc import ABC, abstractmethod
 
 import pandas as pd
 
+from us_libraries._download.models import DatafileType
+
 
 class IStatsService(ABC):
     @abstractmethod
-    def get_system_data(self) -> pd.DataFrame:
+    def get_stats(self, _from: DatafileType) -> pd.DataFrame:
         ...
 
     @abstractmethod
-    def get_state_summary_data(self) -> pd.DataFrame:
-        ...
-
-    @abstractmethod
-    def get_outlet_data(self) -> pd.DataFrame:
+    def read_docs(self, on: DatafileType) -> None:
         ...
