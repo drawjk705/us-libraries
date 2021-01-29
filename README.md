@@ -3,6 +3,15 @@
 A client to pull and query data from Public Libraries Survey.
 
 <!--ts-->
+   * [us-pls](#us-pls)
+      * [The Public Libraries Survey](#the-public-libraries-survey)
+      * [Getting started](#getting-started)
+      * [Getting data](#getting-data)
+      * [Understanding the variables](#understanding-the-variables)
+         * ["But I don't want to read!"](#but-i-dont-want-to-read)
+
+<!-- Added by: joel, at: Thu Jan 28 20:59:08 EST 2021 -->
+
 <!--te-->
 
 ## The Public Libraries Survey
