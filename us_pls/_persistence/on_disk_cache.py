@@ -58,10 +58,14 @@ class OnDiskCache(IOnDiskCache):
 
         if resource_type == "json":
             return self._get_json(path, **kwargs)
-        if resource_type == "txt":
+        elif resource_type == "txt":
             return self._get_txt(path, **kwargs)
-        if resource_type == "df":
+        elif resource_type == "df":
             return pd.read_csv(path)  # type: ignore
+        else:
+            raise CacheException(
+                f'resource_type "{resource_type}" does not match "json", "txt" or "df"'
+            )
 
     def remove(self, resource_path: Union[Path, PathLike[str]]) -> None:
         path = self._get_full_path(Path(resource_path))
@@ -121,3 +125,8 @@ class OnDiskCache(IOnDiskCache):
             shutil.rmtree(self._cache_path)
 
         self._cache_path.mkdir(parents=True, exist_ok=True)
+
+
+class CacheException(Exception):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)

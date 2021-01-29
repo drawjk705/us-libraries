@@ -8,7 +8,7 @@ import pytest
 from pytest_mock.plugin import MockerFixture
 
 from us_pls._config import Config
-from us_pls._persistence.on_disk_cache import OnDiskCache
+from us_pls._persistence.on_disk_cache import CacheException, OnDiskCache
 
 default_config = Config(2019)
 
@@ -156,6 +156,16 @@ def test_get_df(
     mock_read_csv.assert_called_once_with(Path("data/2019/something"))
     mock_json_load.assert_not_called()
     mock_open.assert_not_called()
+
+
+def test_get_bad_type(mock_path_exists: MagicMock):
+    mock_path_exists.return_value = True
+
+    with pytest.raises(
+        CacheException,
+        match='resource_type "banana" does not match "json", "txt" or "df"',
+    ):
+        get_cache().get("somewhere", "banana")  # type: ignore
 
 
 @pytest.mark.parametrize("is_dir", [True, False])
