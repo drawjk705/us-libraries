@@ -1,6 +1,7 @@
 [tool.poetry]
 authors = ["Joel Krim <drawjk705@gmail.com>"]
 description = "Client to get and analyze data from the US Public Library Survey"
+license = "MIT"
 name = "us-pls"
 readme = "README.md"
 repository = "https://github.com/drawjk705/us-libraries"
