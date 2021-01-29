@@ -1,6 +1,4 @@
 import inspect
-import shutil
-from pathlib import Path
 from typing import Dict, cast
 from unittest.mock import MagicMock
 
@@ -13,23 +11,6 @@ from pytest_mock.plugin import MockerFixture
 from tests import utils
 
 # pyright: reportPrivateUsage=false
-
-
-# pathlib.Path mocks
-@pytest.fixture
-def mock_path_mkdir(mocker: MockerFixture) -> MagicMock:
-    return mocker.patch.object(Path, "mkdir")
-
-
-@pytest.fixture
-def mock_path_exists(mocker: MockerFixture) -> MagicMock:
-    return mocker.patch.object(Path, "exists")
-
-
-# shutil mocks
-@pytest.fixture
-def mock_rmtree(mocker: MockerFixture) -> MagicMock:
-    return mocker.patch.object(shutil, "rmtree")
 
 
 # pandas mocks

@@ -3,7 +3,7 @@ import sys
 
 from us_pls._logger.filters import ModuleFilter
 
-DEFAULT_LOG_FILE = "us-libraries.log"
+DEFAULT_LOG_FILE = "us-pls.log"
 
 
 def configure_logger(log_file: str, data_year: int) -> None:
@@ -31,6 +31,11 @@ def configure_logger(log_file: str, data_year: int) -> None:
     info_stream_handler.addFilter(ModuleFilter())
     logger.addHandler(info_stream_handler)
 
+    warning_stream_handler = logging.StreamHandler(sys.stdout)
+    warning_stream_handler.setLevel(logging.WARNING)
+    warning_stream_handler.setFormatter(formatter)
+    logger.addHandler(warning_stream_handler)
+
     error_stream_handler = logging.StreamHandler(sys.stdout)
     error_stream_handler.setLevel(logging.ERROR)
     error_stream_handler.setFormatter(formatter)
@@ -44,5 +49,8 @@ def configure_logger(log_file: str, data_year: int) -> None:
     logging.basicConfig(
         level=logging.DEBUG,
         format=log_format,
-        handlers=[root_file_handler, info_stream_handler],
+        handlers=[
+            root_file_handler,
+            info_stream_handler,
+        ],
     )

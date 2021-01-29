@@ -1,8 +1,10 @@
 import json
+import logging
 import os
 import shutil
 from pathlib import Path
-from typing import Any, Generator, List
+from typing import Any, Generator, List, cast
+from unittest.mock import MagicMock
 
 import pytest
 import requests
@@ -170,8 +172,8 @@ def test_api_hits(
             assert api_calls == []
         else:
             assert api_calls == [
-                "https://www.imls.gov//sites/default/files/fy2017_pls_data_file_documentation.pdf",
-                "https://www.imls.gov//sites/default/files/pls_fy2017_data_files_csv.zip",
+                "https://www.imls.gov/sites/default/files/fy2017_pls_data_file_documentation.pdf",
+                "https://www.imls.gov/sites/default/files/pls_fy2017_data_files_csv.zip",
             ]
     else:
         if downloaded_files_exist:
@@ -181,8 +183,8 @@ def test_api_hits(
         else:
             assert api_calls == [
                 "https://www.imls.gov/research-evaluation/data-collection/public-libraries-survey",
-                "https://www.imls.gov//sites/default/files/fy2017_pls_data_file_documentation.pdf",
-                "https://www.imls.gov//sites/default/files/pls_fy2017_data_files_csv.zip",
+                "https://www.imls.gov/sites/default/files/fy2017_pls_data_file_documentation.pdf",
+                "https://www.imls.gov/sites/default/files/pls_fy2017_data_files_csv.zip",
             ]
 
 
@@ -205,12 +207,18 @@ def test_given_download_returns_400(mocker: MockerFixture):
     mocker.patch.object(
         requests, "get", side_effect=[MockRes(200, content=html), MockRes(400)]
     )
+    mock_logger = MagicMock()
 
-    with pytest.raises(
-        Exception,
-        match="Received a non-200 status code for https://www.imls.gov//sites/default/files/fy2017_pls_data_file_documentation.pdf: 400",
-    ):
+    mocker.patch.object(logging, "getLogger", return_value=mock_logger)
+
+    try:
         PublicLibrariesSurvey(2017)
+    except:
+        pass
+
+    cast(logging.Logger, mock_logger).warning.assert_called_once_with(
+        "Received a non-200 status code for https://www.imls.gov/sites/default/files/fy2017_pls_data_file_documentation.pdf: 400"
+    )
 
 
 @pytest.mark.integration

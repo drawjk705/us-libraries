@@ -1,5 +1,5 @@
-import os
 import zipfile
+from pathlib import Path
 from typing import Dict
 from unittest.mock import MagicMock, call
 
@@ -14,14 +14,10 @@ from us_pls._config import Config
 from us_pls._download.download_service import DownloadService
 from us_pls._download.models import DownloadType
 from us_pls._logger.interface import ILoggerFactory
+from us_pls._persistence.interface import IOnDiskCache
 from us_pls._scraper.interface import IScrapingService
 
 config = Config(2020)
-
-
-@pytest.fixture
-def mock_os(mocker: MockerFixture) -> MagicMock:
-    return mocker.patch("us_pls._download.download_service.os")
 
 
 @pytest.fixture
@@ -36,9 +32,12 @@ def mock_path(mocker: MockerFixture) -> MagicMock:
 
 class LightDownloadService(DownloadService):
     def __init__(
-        self, scraper: IScrapingService, logger_factory: ILoggerFactory
+        self,
+        scraper: IScrapingService,
+        cache: IOnDiskCache,
+        logger_factory: ILoggerFactory,
     ) -> None:
-        super().__init__(config, scraper, logger_factory)
+        super().__init__(config, scraper, cache, logger_factory)
 
 
 class TestDownloadService(ApiServiceTestFixture[LightDownloadService]):
@@ -104,7 +103,7 @@ class TestDownloadService(ApiServiceTestFixture[LightDownloadService]):
         self._service._try_download_resource(scraped_dict, "resource", download_type)
 
         if not has_urls:
-            self.cast_mock(self._service._logger.info).assert_called_once_with(
+            self.cast_mock(self._service._logger.warning).assert_called_once_with(
                 "The resource `resource` does not exist for 2020"
             )
             self.requests_get_mock.assert_not_called()
@@ -124,29 +123,35 @@ class TestDownloadService(ApiServiceTestFixture[LightDownloadService]):
                     should_unzip=download_type == DownloadType.CsvZip,
                 )
 
+    def test_clean_up_readme_given_no_readme(self):
+        self.mocker.patch.object(self._service._cache, "get", return_value=None)
+
+        self._service._clean_up_readme()
+
+        self.cast_mock(self._service._logger.debug).assert_called_with(
+            "No readme exists for this year"
+        )
+
     @pytest.mark.parametrize("should_unzip", [True, False])
-    def test_write_content(
-        self, should_unzip: bool, mock_os: os, mock_zipfile: MagicMock
-    ):
-        mock_prefix = "prefix"
-        self.mocker.patch.object(self._service, "_data_prefix", mock_prefix)
-        mock_open = self.mocker.patch("builtins.open")
-
-        path = f"{mock_prefix}/{DownloadType.Documentation.value}"
-
-        mock_move_content = self.mocker.patch.object(self._service, "_move_content")
+    def test_write_content(self, should_unzip: bool, mock_zipfile: MagicMock):
+        self.mocker.patch.object(Path, "is_dir", return_value=False)
+        self.mocker.patch.object(
+            self._service._cache.cache_path, "iterdir", return_value=[Path()]
+        )
 
         self._service._write_content(
             DownloadType.Documentation, b"content", should_unzip
         )
 
-        mock_open.assert_called_once_with(path, "wb")
+        self.cast_mock(self._service._cache.put).assert_called_once_with(
+            b"content", DownloadType.Documentation.value
+        )
 
         if should_unzip:
-            mock_zipfile.assert_called_once_with(path, "r")
-            mock_move_content.assert_called_once()
-            self.cast_mock(mock_os.remove).assert_called_once_with(path)
+            mock_zipfile.assert_called_once()
+            self.cast_mock(self._service._cache.rename).assert_called_once()
+            self.cast_mock(self._service._cache.remove).assert_called_once()
         else:
             mock_zipfile.assert_not_called()
-            mock_move_content.assert_not_called()
-            self.cast_mock(mock_os.remove).assert_not_called()
+            self.cast_mock(self._service._cache.rename).assert_not_called()
+            self.cast_mock(self._service._cache.remove).assert_not_called()

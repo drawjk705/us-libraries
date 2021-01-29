@@ -3,13 +3,14 @@
 A client to pull and query data from the Public Libraries Survey.
 
 <!--ts-->
-   * [us-pls](#us-pls)
-      * [The Public Libraries Survey](#the-public-libraries-survey)
-      * [Installation](#installation)
-      * [Getting started](#getting-started)
-      * [Getting data](#getting-data)
-      * [Understanding the variables](#understanding-the-variables)
-         * ["But I don't want to read!"](#but-i-dont-want-to-read)
+
+-   [us-pls](#us-pls)
+    -   [The Public Libraries Survey](#the-public-libraries-survey)
+    -   [Installation](#installation)
+    -   [Getting started](#getting-started)
+    -   [Getting data](#getting-data)
+    -   [Understanding the variables](#understanding-the-variables)
+        -   ["But I don't want to read!"](#but-i-dont-want-to-read)
 
 <!-- Added by: runner, at: Fri Jan 29 02:04:28 UTC 2021 -->
 
@@ -49,7 +50,7 @@ The survey offers three datasets:
 To select and query a dataset, do the following:
 
 ```python
->>> from pls import DatafileType
+>>> from us_pls import DatafileType
 >>> pls_client.get_stats(_for=DatafileType.<Type of interest>)
 
 <pandas.DataFrame with the data>

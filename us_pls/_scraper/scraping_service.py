@@ -1,9 +1,7 @@
 # pyright: reportUnknownMemberType=false
 
-import json
 import logging
 import re
-from pathlib import Path
 from typing import Dict, List, Union, cast
 
 import bs4
@@ -12,39 +10,39 @@ from bs4.element import NavigableString, Tag
 
 from us_pls._config import Config
 from us_pls._logger.interface import ILoggerFactory
+from us_pls._persistence.interface import IOnDiskCache
 from us_pls._scraper.interface import IScrapingService
 
 PUBLIC_LIBRARIES_SURVEY_URL = (
     "https://www.imls.gov/research-evaluation/data-collection/public-libraries-survey"
 )
 
-CACHED_URLS_FILE = "urls.json"
+CACHED_URLS_FILE = "../urls.json"
 
 
 class ScrapingService(IScrapingService):
     _config: Config
     _logger: logging.Logger
+    _cache: IOnDiskCache
 
-    def __init__(self, config: Config, logger_factory: ILoggerFactory) -> None:
+    def __init__(
+        self, config: Config, logger_factory: ILoggerFactory, cache: IOnDiskCache
+    ) -> None:
         self._config = config
         self._logger = logger_factory.get_logger(__name__)
+        self._cache = cache
 
     def scrape_files(self) -> Dict[str, Dict[str, str]]:
-        cached_urls_path = Path(f"{self._config.data_dir}/{CACHED_URLS_FILE}")
+        cached_urls = self._cache.get(CACHED_URLS_FILE, "json")
 
-        if cached_urls_path.exists() and not self._config.should_overwrite_cached_urls:
-            self._logger.debug(f"Pulling cached urls from {cached_urls_path}")
-
-            with open(cached_urls_path, "r") as f:
-                return json.load(f)
+        if cached_urls is not None and not self._config.should_overwrite_cached_urls:
+            return cached_urls
 
         self._logger.debug("Pulling URLs from web")
 
         scraped_files = self._scrape_files()
 
-        with open(cached_urls_path, "w") as f:
-            self._logger.debug("Dumping scraped URLs")
-            json.dump(scraped_files, f)
+        self._cache.put(scraped_files, CACHED_URLS_FILE)
 
         return scraped_files
 
@@ -57,7 +55,7 @@ class ScrapingService(IScrapingService):
             msg = f"Got a non-200 status code for {PUBLIC_LIBRARIES_SURVEY_URL}: {res.status_code}"
 
             self._logger.exception(msg)
-            raise Exception(msg)
+            raise ScraperException(msg)
 
         soup = bs4.BeautifulSoup(res.content, "html.parser")
 
@@ -88,6 +86,11 @@ class ScrapingService(IScrapingService):
         match = re.match(r"FY (\d{4})", year_text)
 
         if not match:
-            raise Exception("this should have matched")
+            raise ScraperException("this should have matched")
 
         return match.group(1)
+
+
+class ScraperException(Exception):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
