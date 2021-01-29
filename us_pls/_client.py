@@ -34,4 +34,6 @@ class LibrariesClient:
     def __init_client(self) -> None:
         # download the resources needed to
         # get things started
+        self._logger.info("Initializing client. This may take some time...")
+
         self._downloader.download()
