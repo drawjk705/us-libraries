@@ -31,26 +31,19 @@ class Formatter(EntitySubstitution):
      * None - Do not perform any substitution. This will be faster
               but may result in invalid markup.
     """
-
     XML_FORMATTERS = ...
     HTML_FORMATTERS = ...
     HTML = ...
     XML = ...
     HTML_DEFAULTS = ...
-    def __init__(
-        self,
-        language=...,
-        entity_substitution=...,
-        void_element_close_prefix=...,
-        cdata_containing_tags=...,
-    ) -> None:
+    def __init__(self, language=..., entity_substitution=..., void_element_close_prefix=..., cdata_containing_tags=...) -> None:
         """Constructor.
 
         :param language: This should be Formatter.XML if you are formatting
            XML markup and Formatter.HTML if you are formatting HTML markup.
 
         :param entity_substitution: A function to call to replace special
-           characters with XML/HTML entities. For examples, see
+           characters with XML/HTML entities. For examples, see 
            bs4.dammit.EntitySubstitution.substitute_html and substitute_xml.
         :param void_element_close_prefix: By default, void elements
            are represented as <tag/> (XML rules) rather than <tag>
@@ -61,6 +54,7 @@ class Formatter(EntitySubstitution):
            and their contents should not be formatted.
         """
         ...
+    
     def substitute(self, ns):
         """Process a string that needs to undergo entity substitution.
         This may be a string encountered in an attribute value or as
@@ -71,6 +65,7 @@ class Formatter(EntitySubstitution):
            or numeric entities.
         """
         ...
+    
     def attribute_value(self, value):
         """Process the value of an attribute.
 
@@ -79,23 +74,31 @@ class Formatter(EntitySubstitution):
            or numeric entities.
         """
         ...
+    
     def attributes(self, tag):
         """Reorder a tag's attributes however you want.
-
+        
         By default, attributes are sorted alphabetically. This makes
         behavior consistent between Python 2 and Python 3, and preserves
         backwards compatibility with older versions of Beautiful Soup.
         """
         ...
+    
+
 
 class HTMLFormatter(Formatter):
     """A generic Formatter for HTML."""
-
     REGISTRY = ...
-    def __init__(self, *args, **kwargs) -> None: ...
+    def __init__(self, *args, **kwargs) -> None:
+        ...
+    
+
 
 class XMLFormatter(Formatter):
     """A generic Formatter for XML."""
-
     REGISTRY = ...
-    def __init__(self, *args, **kwargs) -> None: ...
+    def __init__(self, *args, **kwargs) -> None:
+        ...
+    
+
+

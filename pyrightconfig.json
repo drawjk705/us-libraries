@@ -1,6 +1,6 @@
 {
     "include": ["us_pls", "tests"],
-    "ignore": ["typings"],
+    "ignore": ["typings", "scratch.py"],
     "stubPath": "./typings",
 
     "venvPath": "./.venv/",
