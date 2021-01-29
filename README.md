@@ -1,6 +1,6 @@
 # us-pls
 
-A client to pull and query data from Public Libraries Survey.
+A client to pull and query data from the Public Libraries Survey.
 
 <!--ts-->
 
