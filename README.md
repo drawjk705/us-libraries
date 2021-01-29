@@ -3,12 +3,13 @@
 A client to pull and query data from Public Libraries Survey.
 
 <!--ts-->
-   * [us-pls](#us-pls)
-      * [The Public Libraries Survey](#the-public-libraries-survey)
-      * [Getting started](#getting-started)
-      * [Getting data](#getting-data)
-      * [Understanding the variables](#understanding-the-variables)
-         * ["But I don't want to read!"](#but-i-dont-want-to-read)
+
+-   [us-pls](#us-pls)
+    -   [The Public Libraries Survey](#the-public-libraries-survey)
+    -   [Getting started](#getting-started)
+    -   [Getting data](#getting-data)
+    -   [Understanding the variables](#understanding-the-variables)
+        -   ["But I don't want to read!"](#but-i-dont-want-to-read)
 
 <!-- Added by: joel, at: Thu Jan 28 20:59:08 EST 2021 -->
 
@@ -19,6 +20,12 @@ A client to pull and query data from Public Libraries Survey.
 From the Institute of Museum and Library Services' [website](https://www.imls.gov/research-evaluation/data-collection/public-libraries-survey):
 
 The Public Libraries Survey (PLS) examines when, where, and how library services are changing to meet the needs of the public. These data, supplied annually by public libraries across the country, provide information that policymakers and practitioners can use to make informed decisions about the support and strategic management of libraries.
+
+## Installation
+
+```bash
+pip install us-pls
+```
 
 ## Getting started
 
