@@ -83,3 +83,31 @@ class TestStatsService(ServiceTestFixture[LightStatsService]):
                 "short4": "short 4 val 3",
             },
         ]
+
+    def test_get_stats_given_none(self):
+        self.mocker.patch.object(self._service._cache, "get", return_value=None)
+
+        res = self._service.get_stats(DatafileType.OutletData)
+
+        assert res.empty
+
+    def test_read_docs_given_no_docs(
+        self,
+    ):
+        self.mocker.patch.object(self._service, "_documentation", {})
+        self.mocker.patch.object(self._service._cache, "get", return_value=None)
+
+        self._service.read_docs(DatafileType.OutletData)
+
+        self.cast_mock(self._service._logger.debug).assert_called_with(
+            "No readme exists for this year"
+        )
+
+    def test_get_documentation_given_got_it_already(self):
+        self.mocker.patch.object(self._service, "_documentation", dict(some="thing"))
+
+        self._service._get_documentation()
+
+        self.cast_mock(self._service._logger.debug).assert_called_with(
+            "Already pulled documentation"
+        )

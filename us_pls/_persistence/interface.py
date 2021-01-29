@@ -12,16 +12,20 @@ class IOnDiskCache(ABC):
     def exists(self, resource_path: str) -> bool:
         ...
 
-    def put(self, resource: Union[bytes, Dict[str, Any]], resource_path: str) -> None:
-        ...
-
-    @overload
-    def get(self, resource_path: str, resource_type: Literal["txt"]) -> Optional[str]:
+    def put(
+        self, resource: Union[bytes, Dict[str, Any]], resource_path: str, **kwargs: str
+    ) -> None:
         ...
 
     @overload
     def get(
-        self, resource_path: str, resource_type: Literal["json"]
+        self, resource_path: str, resource_type: Literal["txt"], **kwargs: str
+    ) -> Optional[str]:
+        ...
+
+    @overload
+    def get(
+        self, resource_path: str, resource_type: Literal["json"], **kwargs: str
     ) -> Optional[Dict[str, Any]]:
         ...
 
@@ -31,7 +35,7 @@ class IOnDiskCache(ABC):
     ) -> Optional[pd.DataFrame]:
         ...
 
-    def get(self, resource_path, resource_type):  # type: ignore
+    def get(self, resource_path, resource_type, **kwargs):  # type: ignore
         ...
 
     def remove(self, resource_path: Union[Path, PathLike[str]]) -> None:

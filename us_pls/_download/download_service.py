@@ -150,26 +150,20 @@ class DownloadService(IDownloadService):
     def _clean_up_readme(self):
         self._logger.debug("Cleaning up readme")
 
-        readme_path = Path(f"{self._config.data_dir}/{self._config.year}/README.txt")
+        readme_text = self._cache.get(
+            "README.txt",
+            "txt",
+            encoding="utf-8",
+            errors="surrogateescape",
+        )
 
-        if not readme_path.exists():
+        if readme_text is None:
             self._logger.debug("No readme exists for this year")
             return
 
-        with open(
-            readme_path,
-            "r",
-            encoding="utf-8",
-            errors="surrogateescape",
-        ) as f:
-            readme_text = f.read()
-
         cleaned_readme_text = "".join([c if ord(c) < 128 else "'" for c in readme_text])
 
-        with open(
-            readme_path,
-            "w",
-            encoding="utf-8",
-            errors="surrogateescape",
-        ) as f:
-            f.write(cleaned_readme_text)
+        self._cache.put(
+            bytes(cleaned_readme_text, "utf-8"),
+            "README.txt",
+        )

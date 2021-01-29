@@ -30,20 +30,23 @@ class OnDiskCache(IOnDiskCache):
 
         return path.exists()
 
-    def put(self, resource: Union[bytes, Dict[str, Any]], resource_path: str) -> None:
+    def put(
+        self, resource: Union[bytes, Dict[str, Any]], resource_path: str, **kwargs: str
+    ) -> None:
         path = self._get_full_path(Path(resource_path))
 
         self._logger.debug(f"Caching resource in {path}")
 
         if isinstance(resource, bytes):
-            self._put_bytes(resource, path)
+            self._put_bytes(resource, path, **kwargs)
         else:
-            self._put_json(resource, path)
+            self._put_json(resource, path, **kwargs)
 
     def get(  # type: ignore
         self,
         resource_path: str,
         resource_type: Union[Literal["df"], Literal["json"], Literal["txt"]],
+        **kwargs: str,
     ) -> Optional[Union[Dict[str, Any], pd.DataFrame, str]]:
         path = self._get_full_path(Path(resource_path))
 
@@ -54,9 +57,9 @@ class OnDiskCache(IOnDiskCache):
         self._logger.debug(f"Cache hit for {path}")
 
         if resource_type == "json":
-            return self._get_json(path)
+            return self._get_json(path, **kwargs)
         if resource_type == "txt":
-            return self._get_txt(path)
+            return self._get_txt(path, **kwargs)
         if resource_type == "df":
             return pd.read_csv(path)  # type: ignore
 
@@ -87,22 +90,24 @@ class OnDiskCache(IOnDiskCache):
 
     # `put` helpers
 
-    def _put_json(self, resource: Dict[str, Any], resource_path: Path) -> None:
-        with open(resource_path, "w") as f:
+    def _put_json(
+        self, resource: Dict[str, Any], resource_path: Path, **kwargs: str
+    ) -> None:
+        with open(resource_path, "w", **kwargs) as f:
             json.dump(resource, f)
 
-    def _put_bytes(self, resource: bytes, resource_path: Path) -> None:
-        with open(resource_path, "wb") as f:
+    def _put_bytes(self, resource: bytes, resource_path: Path, **kwargs: str) -> None:
+        with open(resource_path, "wb", **kwargs) as f:
             f.write(resource)
 
     # `get` helpers
 
-    def _get_json(self, resource_path: Path) -> Dict[str, Any]:
-        with open(resource_path, "r") as f:
+    def _get_json(self, resource_path: Path, **kwargs: str) -> Dict[str, Any]:
+        with open(resource_path, "r", **kwargs) as f:
             return json.load(f)
 
-    def _get_txt(self, resource_path: Path) -> str:
-        with open(resource_path, "r") as f:
+    def _get_txt(self, resource_path: Path, **kwargs: str) -> str:
+        with open(resource_path, "r", **kwargs) as f:
             return f.read()
 
     def _init_cache(self):

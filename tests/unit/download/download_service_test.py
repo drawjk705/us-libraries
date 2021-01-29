@@ -123,6 +123,15 @@ class TestDownloadService(ApiServiceTestFixture[LightDownloadService]):
                     should_unzip=download_type == DownloadType.CsvZip,
                 )
 
+    def test_clean_up_readme_given_no_readme(self):
+        self.mocker.patch.object(self._service._cache, "get", return_value=None)
+
+        self._service._clean_up_readme()
+
+        self.cast_mock(self._service._logger.debug).assert_called_with(
+            "No readme exists for this year"
+        )
+
     @pytest.mark.parametrize("should_unzip", [True, False])
     def test_write_content(self, should_unzip: bool, mock_zipfile: MagicMock):
         self.mocker.patch.object(Path, "is_dir", return_value=False)

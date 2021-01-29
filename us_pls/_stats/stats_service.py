@@ -60,7 +60,7 @@ class StatsService(IStatsService):
         readme = self._cache.get("README.txt", "txt")
 
         if readme is None:
-            self._logger.debug("No readme exists")
+            self._logger.debug("No readme exists for this year")
             return
 
         documentation: List[str] = []
