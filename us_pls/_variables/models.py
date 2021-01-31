@@ -1,9 +1,8 @@
-from typing import Any, Dict, Union
+from typing import Any, Dict, ItemsView, KeysView, Union, ValuesView
 
 
-class Variables(dict[str, Union[str, "Variables"]]):
+class Variables:
     def __init__(self, **kwargs: Union[str, "Variables"]) -> None:
-        self.update(kwargs)
         self.__dict__.update(kwargs)
 
     @staticmethod
@@ -16,6 +15,15 @@ class Variables(dict[str, Union[str, "Variables"]]):
                 variables[k] = v
 
         return variables
+
+    def items(self) -> ItemsView[str, Union[str, "Variables"]]:
+        return self.__dict__.items()
+
+    def keys(self) -> KeysView[str]:
+        return self.__dict__.keys()
+
+    def values(self) -> ValuesView[Union[str, "Variables"]]:
+        return self.__dict__.values()
 
     def flatten(self, val_prefix: str = "") -> Dict[str, str]:
         """
@@ -68,10 +76,28 @@ class Variables(dict[str, Union[str, "Variables"]]):
                     inverted[v] = val_prefix + v
                 continue
 
-            inverted[k] = v.invert(val_prefix=f"{k}_")
+            inverted[k] = v.invert(val_prefix=f"{val_prefix}{k}_")
 
         return inverted
 
     def __setitem__(self, k: str, v: Union[str, "Variables"]) -> None:
         setattr(self, k, v)
-        return super().__setitem__(k, v)
+
+    def __repr__(self) -> str:
+        return self.__dict__.__repr__()
+
+    def __str__(self) -> str:
+        return self.__repr__()
+
+    def __eq__(self, o: object) -> bool:
+        if not isinstance(o, Variables):
+            return False
+
+        if len(o.items()) != len(self.items()):
+            return False
+
+        for k, v in self.items():
+            if v != getattr(o, k, None):
+                return False
+
+        return True
