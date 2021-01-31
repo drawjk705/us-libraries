@@ -155,3 +155,8 @@ class TestDownloadService(ApiServiceTestFixture[LightDownloadService]):
             mock_zipfile.assert_not_called()
             self.cast_mock(self._service._cache.rename).assert_not_called()
             self.cast_mock(self._service._cache.remove).assert_not_called()
+
+    def test_resource_already_exists_given_faulty_resource(self):
+        res = self._service._resource_already_exists("banana")  # type: ignore
+
+        assert res == False

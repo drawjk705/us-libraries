@@ -8,6 +8,7 @@ from us_pls._download.models import DatafileType
 from us_pls._logger.interface import ILoggerFactory
 from us_pls._persistence.interface import IOnDiskCache
 from us_pls._stats.stats_service import StatsService
+from us_pls._transformer.interface import ITransformationService
 
 read_csv_retval = pandas.DataFrame(
     [
@@ -34,9 +35,17 @@ read_csv_retval = pandas.DataFrame(
 
 
 class LightStatsService(StatsService):
-    def __init__(self, cache: IOnDiskCache, logger_factory: ILoggerFactory) -> None:
+    def __init__(
+        self,
+        cache: IOnDiskCache,
+        transformer: ITransformationService,
+        logger_factory: ILoggerFactory,
+    ) -> None:
         super().__init__(
-            config=Config(2018), cache=cache, logger_factory=logger_factory
+            config=Config(2018),
+            cache=cache,
+            transformer=transformer,
+            logger_factory=logger_factory,
         )
 
 
@@ -45,7 +54,7 @@ class TestStatsService(ServiceTestFixture[LightStatsService]):
         "datafile_type",
         [
             DatafileType.OutletData,
-            DatafileType.StateSummaryAndCharacteristicData,
+            DatafileType.SummaryData,
             DatafileType.SystemData,
         ],
     )
@@ -56,13 +65,18 @@ class TestStatsService(ServiceTestFixture[LightStatsService]):
         mock_cache_get = self.mocker.patch.object(
             self._service._cache, "get", return_value=read_csv_retval
         )
+        mock_transform = self.mocker.patch.object(
+            self._service._transformer,
+            "transform_columns",
+            return_value=read_csv_retval,
+        )
 
         res = self._service.get_stats(datafile_type)
 
         mock_cache_get.assert_called_once_with(
             String() & EndsWith(datafile_type.value), "df"
         )
-
+        mock_transform.assert_called_once()
         assert res.to_dict("records") == [
             {
                 "short1": "short 1 val 1",
