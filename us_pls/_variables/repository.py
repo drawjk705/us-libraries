@@ -34,13 +34,13 @@ class VariableRepository(IVariableRepository):
 
         self._summary_data_vars = self._data_dict.get(
             DatafileType.SummaryData, Variables()
-        )
+        ).reorient()
         self._system_data_vars = self._data_dict.get(
             DatafileType.SystemData, Variables()
-        )
+        ).reorient()
         self._outlet_data_vars = self._data_dict.get(
             DatafileType.OutletData, Variables()
-        )
+        ).reorient()
 
     def _get_data_dict_for_year(self) -> Dict[DatafileType, Variables]:
         dict_res = DATA_DICTS.get(self._config.year)

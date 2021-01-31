@@ -1,15 +1,15 @@
 from us_pls._variables.models import Variables
 
 OUTLET_DATA_VARIABLES = Variables(
-    Identification=Variables(
-        STABR="State",
-        LibraryIdCode=Variables(
-            FSCSKEY="FromIMLS",
-            FSCS_SEQ="Suffix",
-            LIBID="FromState",
-        ),
-        C_FSCS="MeetsDefinitionOfPublicLibrary",
-        LIBNAME="Name",
+    STABR="State",
+    LibraryIdCode=Variables(
+        FSCSKEY="FromIMLS",
+        FSCS_SEQ="Suffix",
+        LIBID="FromState",
+    ),
+    C_FSCS="MeetsDefinitionOfPublicLibrary",
+    LIBNAME="Name",
+    StreetAddress=Variables(
         ADDRESS="Address",
         CITY="City",
         ZIP="ZipCode",
@@ -19,7 +19,7 @@ OUTLET_DATA_VARIABLES = Variables(
     ),
     C_OUT_TY="OutletType",
     SQ_FEET="SquareFootage",
-    F_SQ_FT="F_SQ_FT",
+    F_SQ_FT="SquareFootage_ImputationFlag",
     L_NUM_BM="Num_BookmobilesInBookmobileOutletRecord",
     HOURS="HoursOpen",
     WKS_OPEN="WeeksOpen",

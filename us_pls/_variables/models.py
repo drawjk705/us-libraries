@@ -1,9 +1,8 @@
-from typing import Any, Dict, Union
+from typing import Any, Dict, ItemsView, KeysView, Union, ValuesView
 
 
-class Variables(dict[str, Union[str, "Variables"]]):
+class Variables:
     def __init__(self, **kwargs: Union[str, "Variables"]) -> None:
-        self.update(kwargs)
         self.__dict__.update(kwargs)
 
     @staticmethod
@@ -17,12 +16,48 @@ class Variables(dict[str, Union[str, "Variables"]]):
 
         return variables
 
-    def flatten(self, val_prefix: str = "") -> Dict[str, str]:
+    def to_dict(self, flatten: bool = False) -> Dict[str, Any]:
+        if not flatten:
+            dict_res: Dict[str, Any] = {}
+
+            for k, v in self.items():
+                if isinstance(v, str):
+                    dict_res[k] = v
+                else:
+                    dict_res[k] = v.to_dict()
+
+            return dict_res
+        else:
+            return self.__to_flat_dict()
+
+    def __to_flat_dict(self) -> Dict[str, str]:
+        dict_res: Dict[str, str] = {}
+
+        for v in self.values():
+            if isinstance(v, str):
+                dict_res[v] = v
+            else:
+                dict_res.update(v.__to_flat_dict())
+
+        return dict_res
+
+    def items(self) -> ItemsView[str, Union[str, "Variables"]]:
+        return self.__dict__.items()
+
+    def keys(self) -> KeysView[str]:
+        return self.__dict__.keys()
+
+    def values(self) -> ValuesView[Union[str, "Variables"]]:
+        return self.__dict__.values()
+
+    def flatten_and_invert(self, val_prefix: str = "") -> Dict[str, str]:
         """
         Flattens the variable dictionary for renaming pandas
         DataFrame columns:
 
         >>> v = Variables(First=Variables(Second=Variables(CODE_1="Value1", CODE_2="Value2)))
+        >>> v
+        { 'First': { 'Second': { 'CODE_1': 'Value1', 'CODE_2': 'Value2 } } }
         >>> v.flatten()
         { 'CODE_1': 'First_Second_Value1, 'CODE_2': 'First_Second_Value2' }
         """
@@ -30,7 +65,6 @@ class Variables(dict[str, Union[str, "Variables"]]):
         flattened_dict: Dict[str, str] = {}
 
         for k, v in self.items():
-            # in this case, the key is the original variable name
             if isinstance(v, str):
                 # in this case, we haven't renamed the variable; so don't give
                 # it a fancy name
@@ -38,40 +72,66 @@ class Variables(dict[str, Union[str, "Variables"]]):
                     flattened_dict[k] = k
                 else:
                     flattened_dict[k] = val_prefix + v
-                continue
-
-            flattened_dict.update(v.flatten(val_prefix=f"{val_prefix}{k}_"))
+            else:
+                flattened_dict.update(
+                    v.flatten_and_invert(val_prefix=f"{val_prefix}{k}_")
+                )
 
         return flattened_dict
 
-    def invert(self, val_prefix: str = "") -> "Variables":
+    def reorient(self, val_prefix: str = "") -> "Variables":
         """
-        "Inverts" itself, so that variable names will now point to
+        "Reorients" itself, so that variable names will now point to
         their new column names:
 
+        >>> # before
         >>> v = Variables(First=Variables(Second=Variables(CODE="Value")))
+        >>> v.to_dict()
+        { 'First': { 'Second': { 'CODE': 'Value' } } }
+        >>> # after
         >>> v_inverted = v.invert()
-        >>> v.First.Second.Value
-        First_Second_Value
+        >>> v_inverted
+        { 'First': { 'Second': { 'Value': 'First_Second_Value' } } }
         """
 
-        inverted = Variables()
+        reoriented = Variables()
 
         for k, v in self.items():
             # in this case, the key is the original variable name
             if isinstance(v, str):
+                if v in reoriented.keys():
+                    raise Exception(f"{v} is already in reoriented")
+
                 if k == v:
                     # in this case, we haven't renamed the variable; so don't give
                     # it a fancy name
-                    inverted[v] = k
+                    reoriented[v] = k
                 else:
-                    inverted[v] = val_prefix + v
+                    reoriented[v] = val_prefix + v
                 continue
 
-            inverted[k] = v.invert(val_prefix=f"{k}_")
+            reoriented[k] = v.reorient(val_prefix=f"{val_prefix}{k}_")
 
-        return inverted
+        return reoriented
 
     def __setitem__(self, k: str, v: Union[str, "Variables"]) -> None:
         setattr(self, k, v)
-        return super().__setitem__(k, v)
+
+    def __repr__(self) -> str:
+        return self.to_dict().__repr__()
+
+    def __str__(self) -> str:
+        return self.__repr__()
+
+    def __eq__(self, o: object) -> bool:
+        if not isinstance(o, Variables):
+            return False
+
+        if len(o.items()) != len(self.items()):
+            return False
+
+        for k, v in self.items():
+            if v != getattr(o, k, None):
+                return False
+
+        return True

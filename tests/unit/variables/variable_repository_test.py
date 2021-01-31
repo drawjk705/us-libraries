@@ -11,9 +11,15 @@ from us_pls._variables.repository import VariableRepository
 default_config = Config(2019)
 
 data_dict_2019 = {
-    DatafileType.OutletData: Variables(var1="code1"),
-    DatafileType.SummaryData: Variables(var2="code2"),
-    DatafileType.SystemData: Variables(var3="code3"),
+    DatafileType.OutletData: Variables(
+        var1="code1", parent1=Variables(subCode1="sub_code1", subCode2="sub_code2")
+    ),
+    DatafileType.SummaryData: Variables(
+        var2="code2", parent2=Variables(subCode1="sub_code1", subCode2="sub_code2")
+    ),
+    DatafileType.SystemData: Variables(
+        var3="code3", parent3=Variables(subCode1="sub_code1", subCode2="sub_code2")
+    ),
 }
 
 
@@ -52,9 +58,33 @@ class TestVariableRepo(ServiceTestFixture[LightVariableRepo]):
     def test_init_repository(self):
         self._service._init_repository()
 
-        assert self._service.outlet_data_vars == Variables(var1="code1")
-        assert self._service.summary_data_vars == Variables(var2="code2")
-        assert self._service.system_data_vars == Variables(var3="code3")
+        assert self._service.outlet_data_vars == Variables.from_dict(
+            {
+                "code1": "code1",
+                "parent1": {
+                    "sub_code1": "parent1_sub_code1",
+                    "sub_code2": "parent1_sub_code2",
+                },
+            }
+        )
+        assert self._service.summary_data_vars == Variables.from_dict(
+            {
+                "code2": "code2",
+                "parent2": {
+                    "sub_code1": "parent2_sub_code1",
+                    "sub_code2": "parent2_sub_code2",
+                },
+            }
+        )
+        assert self._service.system_data_vars == Variables.from_dict(
+            {
+                "code3": "code3",
+                "parent3": {
+                    "sub_code1": "parent3_sub_code1",
+                    "sub_code2": "parent3_sub_code2",
+                },
+            }
+        )
 
     def test_get_variables_for(self):
         assert (
