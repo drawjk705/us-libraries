@@ -55,6 +55,32 @@ def test_to_dict_flatten(variables: Variables):
     assert len(flattened_dict.keys()) == len(get_expected_keys(variables))
 
 
+def test_to_dict_without_imputation_flags():
+    variables = Variables(
+        Category1=Variables(Var1="Val1", F_Var1="Val1_ImputationFlag"),
+        Category2=Variables(Var1="Val1", F_Var1="Val1_ImputationFlag"),
+        Category3=Variables(
+            SubCategory1=Variables(Var1="Val1", F_Var1="Val1_ImputationFlag")
+        ),
+    )
+
+    as_dict = variables.reorient().to_dict(with_imputation_flags=False)
+    as_flat_dict = variables.reorient().to_dict(
+        flatten=True, with_imputation_flags=False
+    )
+
+    assert as_dict == {
+        "Category1": {"Val1": "Category1_Val1"},
+        "Category2": {"Val1": "Category2_Val1"},
+        "Category3": {"SubCategory1": {"Val1": "Category3_SubCategory1_Val1"}},
+    }
+    assert as_flat_dict == {
+        "Category1_Val1": "Category1_Val1",
+        "Category2_Val1": "Category2_Val1",
+        "Category3_SubCategory1_Val1": "Category3_SubCategory1_Val1",
+    }
+
+
 def test_to_dict_from_dict():
     variables = Variables(
         A0=Variables(B0="A0_B0"), A1=Variables(B1=Variables(C1="A1_B1_C1"))

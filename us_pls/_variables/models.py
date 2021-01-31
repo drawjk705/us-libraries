@@ -16,28 +16,36 @@ class Variables:
 
         return variables
 
-    def to_dict(self, flatten: bool = False) -> Dict[str, Any]:
+    def to_dict(
+        self, flatten: bool = False, with_imputation_flags: bool = True
+    ) -> Dict[str, Any]:
         if not flatten:
             dict_res: Dict[str, Any] = {}
 
             for k, v in self.items():
+                if k.endswith("_ImputationFlag") and not with_imputation_flags:
+                    continue
                 if isinstance(v, str):
                     dict_res[k] = v
                 else:
-                    dict_res[k] = v.to_dict()
+                    dict_res[k] = v.to_dict(with_imputation_flags=with_imputation_flags)
 
             return dict_res
         else:
-            return self.__to_flat_dict()
+            return self.__to_flat_dict(with_imputation_flags=with_imputation_flags)
 
-    def __to_flat_dict(self) -> Dict[str, str]:
+    def __to_flat_dict(self, with_imputation_flags: bool) -> Dict[str, str]:
         dict_res: Dict[str, str] = {}
 
         for v in self.values():
             if isinstance(v, str):
+                if v.endswith("_ImputationFlag") and not with_imputation_flags:
+                    continue
                 dict_res[v] = v
             else:
-                dict_res.update(v.__to_flat_dict())
+                dict_res.update(
+                    v.__to_flat_dict(with_imputation_flags=with_imputation_flags)
+                )
 
         return dict_res
 
