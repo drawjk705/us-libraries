@@ -721,18 +721,20 @@ def test_get_variables():
             "InternationalCommitteeForInfoTechStandardsStateCode_3Digit": "InternationalCommitteeForInfoTechStandardsStateCode_3Digit",
             "GeographicNamesInformationSystemFeatureId": "GeographicNamesInformationSystemFeatureId",
             "CountyPopulation": "CountyPopulation",
-            "CateorizationOfLocale": {
-                "CategorizationBySizeAndProximityToCities": "CateorizationOfLocale_CategorizationBySizeAndProximityToCities",
-                "CategorizationByModalLocaleCodeOfAssociatedStationaryOutlets": "CateorizationOfLocale_CategorizationByModalLocaleCodeOfAssociatedStationaryOutlets",
-                "CategorizationBySizeAndProximityToCities_FromRuralEducationAchievementProgram": "CateorizationOfLocale_CategorizationBySizeAndProximityToCities_FromRuralEducationAchievementProgram",
-                "CategorizationByModalLocaleCodeOfAssociatedStationaryOutlets_FromRuralEducationAchievementProgram": "CateorizationOfLocale_CategorizationByModalLocaleCodeOfAssociatedStationaryOutlets_FromRuralEducationAchievementProgram",
+            "CategorizationOfLocale": {
+                "By": {
+                    "SizeAndProximityToCities": "CategorizationOfLocale_By_SizeAndProximityToCities",
+                    "ModalLocaleCodeOfAssociatedStationaryOutlets": "CategorizationOfLocale_By_ModalLocaleCodeOfAssociatedStationaryOutlets",
+                    "SizeAndProximityToCities_FromRuralEducationAchievementProgram": "CategorizationOfLocale_By_SizeAndProximityToCities_FromRuralEducationAchievementProgram",
+                    "ModalLocaleCodeOfAssociatedStationaryOutlets_FromRuralEducationAchievementProgram": "CategorizationOfLocale_By_ModalLocaleCodeOfAssociatedStationaryOutlets_FromRuralEducationAchievementProgram",
+                }
             },
             "CensusTract": "CensusTract",
             "CensusBlock": "CensusBlock",
             "CongressionalDistrict": "CongressionalDistrict",
             "CoreBasedStatisticalArea": "CoreBasedStatisticalArea",
             "MetropolitanAndMicropolitcanStatisticalAreaFlag": "MetropolitanAndMicropolitcanStatisticalAreaFlag",
-            "Geocoding_AccuraryAndPrecision": "Geocoding_AccuraryAndPrecision",
+            "Geocoding_AccuracyAndPrecision": "Geocoding_AccuracyAndPrecision",
         }
     )
     assert lib.outlet_data_vars == Variables.from_dict(
@@ -771,8 +773,10 @@ def test_get_variables():
             "GeographicNamesInformationSystemFeatureId": "GeographicNamesInformationSystemFeatureId",
             "CountyPopulation": "CountyPopulation",
             "CategorizationOfLocale": {
-                "BySizeAndProximityToCities": "CategorizationOfLocale_BySizeAndProximityToCities",
-                "BySizeAndProximityToCities_FromRuralEducationAchievementProgram": "CategorizationOfLocale_BySizeAndProximityToCities_FromRuralEducationAchievementProgram",
+                "By": {
+                    "SizeAndProximityToCities": "CategorizationOfLocale_By_SizeAndProximityToCities",
+                    "SizeAndProximityToCities_FromRuralEducationAchievementProgram": "CategorizationOfLocale_By_SizeAndProximityToCities_FromRuralEducationAchievementProgram",
+                }
             },
             "CensusTract": "CensusTract",
             "CensusBlock": "CensusBlock",
@@ -787,8 +791,8 @@ def test_get_variables():
         DatafileType.OutletData: {
             "AddressChangeCode": "STATADDR",
             "BureauOfEconomicsAnalysisCode": "OBEREG",
-            "CategorizationOfLocale_BySizeAndProximityToCities": "LOCALE",
-            "CategorizationOfLocale_BySizeAndProximityToCities_FromRuralEducationAchievementProgram": "REAPLOCALE",
+            "CategorizationOfLocale_By_SizeAndProximityToCities": "LOCALE",
+            "CategorizationOfLocale_By_SizeAndProximityToCities_FromRuralEducationAchievementProgram": "REAPLOCALE",
             "CensusBlock": "CENBLOCK",
             "CensusTract": "CENTRACT",
             "CongressionalDistrict": "CDCODE",
@@ -970,10 +974,10 @@ def test_get_variables():
             "CapitalRevenue_From_StateGovernment_ImputationFlag": "F_SCAPRV",
             "CapitalRevenue_Total": "CAP_REV",
             "CapitalRevenue_Total_ImputationFlag": "F_TCAPRV",
-            "CateorizationOfLocale_CategorizationByModalLocaleCodeOfAssociatedStationaryOutlets": "LOCALE_MOD",
-            "CateorizationOfLocale_CategorizationByModalLocaleCodeOfAssociatedStationaryOutlets_FromRuralEducationAchievementProgram": "REAPLOCALE_MOD",
-            "CateorizationOfLocale_CategorizationBySizeAndProximityToCities": "LOCALE_ADD",
-            "CateorizationOfLocale_CategorizationBySizeAndProximityToCities_FromRuralEducationAchievementProgram": "REAPLOCALE_ADD",
+            "CategorizationOfLocale_By_ModalLocaleCodeOfAssociatedStationaryOutlets": "LOCALE_MOD",
+            "CategorizationOfLocale_By_ModalLocaleCodeOfAssociatedStationaryOutlets_FromRuralEducationAchievementProgram": "REAPLOCALE_MOD",
+            "CategorizationOfLocale_By_SizeAndProximityToCities": "LOCALE_ADD",
+            "CategorizationOfLocale_By_SizeAndProximityToCities_FromRuralEducationAchievementProgram": "REAPLOCALE_ADD",
             "CensusBlock": "CENBLOCK",
             "CensusTract": "CENTRACT",
             "Circulation_CountOf_ChildrenMaterials": "KIDCIRCL",
@@ -1008,7 +1012,7 @@ def test_get_variables():
             "FullTimePaidStaff_CountOf_PaidLibrarians_WithMasters_ImputationFlag": "F_MASTER",
             "FullTimePaidStaff_Total": "TOTSTAFF",
             "FullTimePaidStaff_Total_ImputationFlag": "F_TOTSTF",
-            "Geocoding_AccuraryAndPrecision": "GEOMATCH",
+            "Geocoding_AccuracyAndPrecision": "GEOMATCH",
             "GeographicNamesInformationSystemFeatureId": "GNISPLAC",
             "InterLibraryLoans_Amount_Given": "LOANTO",
             "InterLibraryLoans_Amount_Given_ImputationFlag": "F_LOANTO",

@@ -230,16 +230,18 @@ SYSTEM_DATA_VARIABLES = Variables(
     INCITSCO="InternationalCommitteeForInfoTechStandardsStateCode_3Digit",
     GNISPLAC="GeographicNamesInformationSystemFeatureId",
     CNTYPOP="CountyPopulation",
-    CateorizationOfLocale=Variables(
-        LOCALE_ADD="CategorizationBySizeAndProximityToCities",
-        LOCALE_MOD="CategorizationByModalLocaleCodeOfAssociatedStationaryOutlets",
-        REAPLOCALE_ADD="CategorizationBySizeAndProximityToCities_FromRuralEducationAchievementProgram",
-        REAPLOCALE_MOD="CategorizationByModalLocaleCodeOfAssociatedStationaryOutlets_FromRuralEducationAchievementProgram",
+    CategorizationOfLocale=Variables(
+        By=Variables(
+            LOCALE_ADD="SizeAndProximityToCities",
+            LOCALE_MOD="ModalLocaleCodeOfAssociatedStationaryOutlets",
+            REAPLOCALE_ADD="SizeAndProximityToCities_FromRuralEducationAchievementProgram",
+            REAPLOCALE_MOD="ModalLocaleCodeOfAssociatedStationaryOutlets_FromRuralEducationAchievementProgram",
+        )
     ),
     CENTRACT="CensusTract",
     CENBLOCK="CensusBlock",
     CDCODE="CongressionalDistrict",
     CBSA="CoreBasedStatisticalArea",
     MICROF="MetropolitanAndMicropolitcanStatisticalAreaFlag",
-    GEOMATCH="Geocoding_AccuraryAndPrecision",
+    GEOMATCH="Geocoding_AccuracyAndPrecision",
 )

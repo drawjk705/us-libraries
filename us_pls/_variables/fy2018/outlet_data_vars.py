@@ -35,8 +35,10 @@ OUTLET_DATA_VARIABLES = Variables(
     GNISPLAC="GeographicNamesInformationSystemFeatureId",
     CNTYPOP="CountyPopulation",
     CategorizationOfLocale=Variables(
-        LOCALE="BySizeAndProximityToCities",
-        REAPLOCALE="BySizeAndProximityToCities_FromRuralEducationAchievementProgram",
+        By=Variables(
+            LOCALE="SizeAndProximityToCities",
+            REAPLOCALE="SizeAndProximityToCities_FromRuralEducationAchievementProgram",
+        )
     ),
     CENTRACT="CensusTract",
     CENBLOCK="CensusBlock",
