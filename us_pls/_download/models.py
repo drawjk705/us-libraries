@@ -9,5 +9,5 @@ class DownloadType(Enum):
 
 class DatafileType(Enum):
     SystemData = "SystemData.csv"
-    StateSummaryAndCharacteristicData = "StateSummaryAndCharacteristicData.csv"
+    SummaryData = "StateSummaryAndCharacteristicData.csv"
     OutletData = "OutletData.csv"

@@ -5,7 +5,7 @@ from us_pls._logger.configure_logger import DEFAULT_LOG_FILE
 DEFAULT_DATA_DIR = "data"
 
 
-@dataclass(frozen=True)
+@dataclass
 class Config:
     year: int
     data_dir: str = field(default=DEFAULT_DATA_DIR)

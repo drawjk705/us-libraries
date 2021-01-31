@@ -141,7 +141,7 @@ class DownloadService(IDownloadService):
         elif "_outlet_" in path.name.lower() or "out" in path.name.lower():
             new_name = DatafileType.OutletData.value
         elif "_state_" in path.name.lower() or "sum" in path.name.lower():
-            new_name = DatafileType.StateSummaryAndCharacteristicData.value
+            new_name = DatafileType.SummaryData.value
         elif "readme" in path.name.lower():
             new_name = "README.txt"
 

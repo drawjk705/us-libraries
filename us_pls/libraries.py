@@ -17,6 +17,11 @@ from us_pls._scraper.interface import IScrapingService
 from us_pls._scraper.scraping_service import ScrapingService
 from us_pls._stats.interface import IStatsService
 from us_pls._stats.stats_service import StatsService
+from us_pls._transformer.interface import ITransformationService
+from us_pls._transformer.transformation_service import TransformationService
+from us_pls._variables.interface import IVariableRepository
+from us_pls._variables.models import Variables
+from us_pls._variables.repository import VariableRepository
 
 
 class PublicLibrariesSurvey:
@@ -52,6 +57,8 @@ class PublicLibrariesSurvey:
         container.register(IDownloadService, DownloadService)
         container.register(IStatsService, StatsService)
         container.register(IOnDiskCache, OnDiskCache)
+        container.register(ITransformationService, TransformationService)
+        container.register(IVariableRepository, VariableRepository)
         container.register(LibrariesClient)
 
         configure_logger(log_file, year)
@@ -63,6 +70,18 @@ class PublicLibrariesSurvey:
 
     def read_docs(self, on: DatafileType) -> None:
         return self._client.read_docs(on)
+
+    @property
+    def summary_data_vars(self) -> Variables:
+        return self._client.summary_data_vars
+
+    @property
+    def system_data_vars(self) -> Variables:
+        return self._client.system_data_vars
+
+    @property
+    def outlet_data_vars(self) -> Variables:
+        return self._client.outlet_data_vars
 
     def __repr__(self) -> str:
         return f"<PublicLibrariesSurvey {self._config.year}>"

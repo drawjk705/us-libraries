@@ -11,20 +11,27 @@ from us_pls._download.models import DatafileType
 from us_pls._logger.interface import ILoggerFactory
 from us_pls._persistence.interface import IOnDiskCache
 from us_pls._stats.interface import IStatsService
+from us_pls._transformer.interface import ITransformationService
 
 
 class StatsService(IStatsService):
     _config: Config
     _cache: IOnDiskCache
+    _transformer: ITransformationService
     _logger: logging.Logger
 
     _documentation: Dict[DatafileType, str]
 
     def __init__(
-        self, config: Config, cache: IOnDiskCache, logger_factory: ILoggerFactory
+        self,
+        config: Config,
+        cache: IOnDiskCache,
+        transformer: ITransformationService,
+        logger_factory: ILoggerFactory,
     ) -> None:
         self._config = config
         self._cache = cache
+        self._transformer = transformer
         self._logger = logger_factory.get_logger(__name__)
 
         self._documentation = {}
@@ -37,7 +44,7 @@ class StatsService(IStatsService):
         if stats is None:
             return pd.DataFrame()
 
-        return stats
+        return self._transformer.transform_columns(stats, _from)
 
     def read_docs(self, on: DatafileType) -> None:
         self._logger.debug(f"Reading docs on {on.value}")
@@ -111,9 +118,7 @@ class StatsService(IStatsService):
             ):
                 self._documentation[DatafileType.SystemData] = doc
             elif "State Summary/State Characteristics Data File" in doc[:200]:
-                self._documentation[
-                    DatafileType.StateSummaryAndCharacteristicData
-                ] = doc
+                self._documentation[DatafileType.SummaryData] = doc
             elif "Outlet Data File" in doc[:200]:
                 self._documentation[DatafileType.OutletData] = doc
 
