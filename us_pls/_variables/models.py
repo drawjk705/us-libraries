@@ -40,7 +40,7 @@ class Variables(dict[str, Union[str, "Variables"]]):
                     flattened_dict[k] = val_prefix + v
                 continue
 
-            flattened_dict.update(v.flatten(val_prefix=f"{k}_"))
+            flattened_dict.update(v.flatten(val_prefix=f"{val_prefix}{k}_"))
 
         return flattened_dict
 

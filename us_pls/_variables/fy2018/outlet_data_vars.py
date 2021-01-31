@@ -3,10 +3,12 @@ from us_pls._variables.models import Variables
 OUTLET_DATA_VARIABLES = Variables(
     Identification=Variables(
         STABR="State",
-        FSCSKEY="LibraryIdCode_FromIMLS",
-        FSCS_SEQ="LibraryIdCode_Suffix",
+        LibraryIdCode=Variables(
+            FSCSKEY="FromIMLS",
+            FSCS_SEQ="Suffix",
+            LIBID="FromState",
+        ),
         C_FSCS="MeetsDefinitionOfPublicLibrary",
-        LIBID="LibraryIdCode_FromState",
         LIBNAME="Name",
         ADDRESS="Address",
         CITY="City",
@@ -32,8 +34,10 @@ OUTLET_DATA_VARIABLES = Variables(
     INCITSCO="InternationalCommiteeForInfoTechStandardsStateCode_ThreeDigit",
     GNISPLAC="GeographicNamesInformationSystemFeatureId",
     CNTYPOP="CountyPopulation",
-    LOCALE="CategorizationOfLocale_BySizeAndProximityToCities",
-    REAPLOCALE="CategorizationOfLocale_BySizeAndProximityToCities_FromRuralEducationAchievementProgram",
+    CategorizationOfLocale=Variables(
+        LOCALE="BySizeAndProximityToCities",
+        REAPLOCALE="BySizeAndProximityToCities_FromRuralEducationAchievementProgram",
+    ),
     CENTRACT="CensusTract",
     CENBLOCK="CensusBlock",
     CDCODE="CongressionalDistrict",
