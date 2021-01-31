@@ -16,6 +16,31 @@ class Variables:
 
         return variables
 
+    def to_dict(self, flatten: bool = False) -> Dict[str, Any]:
+        if not flatten:
+            dict_res: Dict[str, Any] = {}
+
+            for k, v in self.items():
+                if isinstance(v, str):
+                    dict_res[k] = v
+                else:
+                    dict_res[k] = v.to_dict()
+
+            return dict_res
+        else:
+            return self.__to_flat_dict()
+
+    def __to_flat_dict(self, key_prefix: str = "") -> Dict[str, str]:
+        dict_res: Dict[str, str] = {}
+
+        for k, v in self.items():
+            if isinstance(v, str):
+                dict_res[key_prefix + k] = v
+            else:
+                dict_res.update(v.__to_flat_dict(key_prefix=f"{key_prefix}{k}_"))
+
+        return dict_res
+
     def items(self) -> ItemsView[str, Union[str, "Variables"]]:
         return self.__dict__.items()
 
@@ -84,7 +109,7 @@ class Variables:
         setattr(self, k, v)
 
     def __repr__(self) -> str:
-        return self.__dict__.__repr__()
+        return self.to_dict().__repr__()
 
     def __str__(self) -> str:
         return self.__repr__()

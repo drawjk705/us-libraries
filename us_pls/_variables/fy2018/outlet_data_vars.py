@@ -1,15 +1,15 @@
 from us_pls._variables.models import Variables
 
 OUTLET_DATA_VARIABLES = Variables(
-    Identification=Variables(
-        STABR="State",
-        LibraryIdCode=Variables(
-            FSCSKEY="FromIMLS",
-            FSCS_SEQ="Suffix",
-            LIBID="FromState",
-        ),
-        C_FSCS="MeetsDefinitionOfPublicLibrary",
-        LIBNAME="Name",
+    STABR="State",
+    LibraryIdCode=Variables(
+        FSCSKEY="FromIMLS",
+        FSCS_SEQ="Suffix",
+        LIBID="FromState",
+    ),
+    C_FSCS="MeetsDefinitionOfPublicLibrary",
+    LIBNAME="Name",
+    StreetAddress=Variables(
         ADDRESS="Address",
         CITY="City",
         ZIP="ZipCode",
