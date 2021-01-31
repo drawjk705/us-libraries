@@ -97,8 +97,8 @@ class Variables:
         >>> v.to_dict()
         { 'First': { 'Second': { 'CODE': 'Value' } } }
         >>> # after
-        >>> v_inverted = v.invert()
-        >>> v_inverted
+        >>> v_reoriented = v.reorient()
+        >>> v_reoriented
         { 'First': { 'Second': { 'Value': 'First_Second_Value' } } }
         """
 
