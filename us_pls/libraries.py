@@ -1,5 +1,7 @@
 # pyright: reportUnknownMemberType=false
 
+from typing import Dict
+
 import pandas as pd
 import punq
 
@@ -82,6 +84,10 @@ class PublicLibrariesSurvey:
     @property
     def outlet_data_vars(self) -> Variables:
         return self._client.outlet_data_vars
+
+    @property
+    def new_col_to_original_col_mapping(self) -> Dict[DatafileType, Dict[str, str]]:
+        return self._client.new_col_to_original_col_mapping
 
     def __repr__(self) -> str:
         return f"<PublicLibrariesSurvey {self._config.year}>"

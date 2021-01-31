@@ -1,4 +1,5 @@
 import logging
+from typing import Dict
 
 import pandas as pd
 
@@ -47,6 +48,10 @@ class LibrariesClient:
     @property
     def outlet_data_vars(self) -> Variables:
         return self._variable_repo.outlet_data_vars
+
+    @property
+    def new_col_to_original_col_mapping(self) -> Dict[DatafileType, Dict[str, str]]:
+        return self._variable_repo.new_col_to_original_col_mapping
 
     def __init_client(self) -> None:
         # download the resources needed to

@@ -19,6 +19,7 @@ class VariableRepository(IVariableRepository):
     _outlet_data_vars: Variables
     _summary_data_vars: Variables
     _system_data_vars: Variables
+    _new_col_to_original_col_mapping: Dict[DatafileType, Dict[str, str]]
 
     def __init__(self, config: Config, logger_factory: ILoggerFactory) -> None:
         self._config = config
@@ -41,6 +42,13 @@ class VariableRepository(IVariableRepository):
         self._outlet_data_vars = self._data_dict.get(
             DatafileType.OutletData, Variables()
         ).reorient()
+
+        self._new_col_to_original_col_mapping = {}
+
+        for k, v in self._data_dict.items():
+            self._new_col_to_original_col_mapping[k] = {
+                _v: _k for _k, _v in v.flatten_and_invert().items()
+            }
 
     def _get_data_dict_for_year(self) -> Dict[DatafileType, Variables]:
         dict_res = DATA_DICTS.get(self._config.year)
