@@ -35,7 +35,7 @@ class TransformationService(ITransformationService):
             self._variable_repo.get_variables_for(datafile_type) or Variables()
         )
 
-        renamed_df: pd.DataFrame = df.rename(columns=column_mapping.flatten())  # type: ignore
+        renamed_df: pd.DataFrame = df.rename(columns=column_mapping.flatten_and_invert())  # type: ignore
 
         if renamed_df.columns.tolist() != list(column_mapping.values()):
             self._logger.warning(

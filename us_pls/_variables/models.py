@@ -30,14 +30,14 @@ class Variables:
         else:
             return self.__to_flat_dict()
 
-    def __to_flat_dict(self, key_prefix: str = "") -> Dict[str, str]:
+    def __to_flat_dict(self) -> Dict[str, str]:
         dict_res: Dict[str, str] = {}
 
-        for k, v in self.items():
+        for v in self.values():
             if isinstance(v, str):
-                dict_res[key_prefix + k] = v
+                dict_res[v] = v
             else:
-                dict_res.update(v.__to_flat_dict(key_prefix=f"{key_prefix}{k}_"))
+                dict_res.update(v.__to_flat_dict())
 
         return dict_res
 
@@ -50,12 +50,14 @@ class Variables:
     def values(self) -> ValuesView[Union[str, "Variables"]]:
         return self.__dict__.values()
 
-    def flatten(self, val_prefix: str = "") -> Dict[str, str]:
+    def flatten_and_invert(self, val_prefix: str = "") -> Dict[str, str]:
         """
         Flattens the variable dictionary for renaming pandas
         DataFrame columns:
 
         >>> v = Variables(First=Variables(Second=Variables(CODE_1="Value1", CODE_2="Value2)))
+        >>> v
+        { 'First': { 'Second': { 'CODE_1': 'Value1', 'CODE_2': 'Value2 } } }
         >>> v.flatten()
         { 'CODE_1': 'First_Second_Value1, 'CODE_2': 'First_Second_Value2' }
         """
@@ -63,7 +65,6 @@ class Variables:
         flattened_dict: Dict[str, str] = {}
 
         for k, v in self.items():
-            # in this case, the key is the original variable name
             if isinstance(v, str):
                 # in this case, we haven't renamed the variable; so don't give
                 # it a fancy name
@@ -71,39 +72,47 @@ class Variables:
                     flattened_dict[k] = k
                 else:
                     flattened_dict[k] = val_prefix + v
-                continue
-
-            flattened_dict.update(v.flatten(val_prefix=f"{val_prefix}{k}_"))
+            else:
+                flattened_dict.update(
+                    v.flatten_and_invert(val_prefix=f"{val_prefix}{k}_")
+                )
 
         return flattened_dict
 
-    def invert(self, val_prefix: str = "") -> "Variables":
+    def reorient(self, val_prefix: str = "") -> "Variables":
         """
-        "Inverts" itself, so that variable names will now point to
+        "Reorients" itself, so that variable names will now point to
         their new column names:
 
+        >>> # before
         >>> v = Variables(First=Variables(Second=Variables(CODE="Value")))
+        >>> v.to_dict()
+        { 'First': { 'Second': { 'CODE': 'Value' } } }
+        >>> # after
         >>> v_inverted = v.invert()
-        >>> v.First.Second.Value
-        First_Second_Value
+        >>> v_inverted
+        { 'First': { 'Second': { 'Value': 'First_Second_Value' } } }
         """
 
-        inverted = Variables()
+        reoriented = Variables()
 
         for k, v in self.items():
             # in this case, the key is the original variable name
             if isinstance(v, str):
+                if v in reoriented.keys():
+                    raise Exception(f"{v} is already in reoriented")
+
                 if k == v:
                     # in this case, we haven't renamed the variable; so don't give
                     # it a fancy name
-                    inverted[v] = k
+                    reoriented[v] = k
                 else:
-                    inverted[v] = val_prefix + v
+                    reoriented[v] = val_prefix + v
                 continue
 
-            inverted[k] = v.invert(val_prefix=f"{val_prefix}{k}_")
+            reoriented[k] = v.reorient(val_prefix=f"{val_prefix}{k}_")
 
-        return inverted
+        return reoriented
 
     def __setitem__(self, k: str, v: Union[str, "Variables"]) -> None:
         setattr(self, k, v)

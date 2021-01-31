@@ -513,8 +513,6 @@ def test_get_variables():
             "MeetsDefinitionOfPublicLibrary": "MeetsDefinitionOfPublicLibrary",
             "TypeOfRegionServed": "TypeOfRegionServed",
             "DidLegalServiceAreaChangeInPastYear": "DidLegalServiceAreaChangeInPastYear",
-            "ReportingPeriodStartDate": "ReportingPeriodStartDate",
-            "ReportingPeriodEndDate": "ReportingPeriodEndDate",
             "Population": {
                 "Of": {
                     "LegalServiceArea": "Population_Of_LegalServiceArea",
@@ -757,7 +755,7 @@ def test_get_variables():
             },
             "OutletType": "OutletType",
             "SquareFootage": "SquareFootage",
-            "F_SQ_FT": "F_SQ_FT",
+            "SquareFootage_ImputationFlag": "SquareFootage_ImputationFlag",
             "Num_BookmobilesInBookmobileOutletRecord": "Num_BookmobilesInBookmobileOutletRecord",
             "HoursOpen": "HoursOpen",
             "WeeksOpen": "WeeksOpen",

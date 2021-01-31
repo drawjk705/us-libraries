@@ -19,7 +19,7 @@ OUTLET_DATA_VARIABLES = Variables(
     ),
     C_OUT_TY="OutletType",
     SQ_FEET="SquareFootage",
-    F_SQ_FT="F_SQ_FT",
+    F_SQ_FT="SquareFootage_ImputationFlag",
     L_NUM_BM="Num_BookmobilesInBookmobileOutletRecord",
     HOURS="HoursOpen",
     WKS_OPEN="WeeksOpen",
